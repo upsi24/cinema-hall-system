@@ -74,7 +74,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .header-panel h1 {
             margin: 0;
@@ -92,6 +92,21 @@
             font-size: 1rem;
             color: #7f8c8d;
             font-weight: normal;
+        }
+
+        /* Global Next Movie Banner */
+        .global-next-banner {
+            background-color: #1abc9c;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         /* Tab Navigation */
@@ -334,7 +349,59 @@
             cursor: default;
         }
 
-        /* Reminder Panel */
+        /* FULL SCREEN MODAL OVERLAY */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 5px solid var(--danger);
+        }
+        .modal-content h2 {
+            color: var(--danger);
+            font-size: 2rem;
+            margin-top: 0;
+        }
+        .modal-content p {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+        .modal-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Reminder Panel (Small Toast Alerts) */
         .reminder-panel {
             position: fixed;
             top: 20px;
@@ -407,6 +474,13 @@
                 gap: 10px;
             }
             .clock { text-align: left; }
+            
+            .global-next-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
             .countdown-banner {
                 flex-direction: column;
                 align-items: flex-start;
@@ -427,6 +501,15 @@
 </head>
 <body>
 
+    <!-- Full Screen Overlay Modal (Hidden by Default) -->
+    <div id="alert-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 id="modal-title">🚨 ALERT 🚨</h2>
+            <p id="modal-desc">Message goes here</p>
+            <button class="modal-btn" onclick="closeModal()">I'm On It!</button>
+        </div>
+    </div>
+
     <!-- Sidebar for 11 Halls -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">GSC Hall Selector</div>
@@ -441,6 +524,11 @@
                 <div class="clock-12h">--:--:-- --</div>
                 <div class="clock-24h">--:--:--</div>
             </div>
+        </div>
+
+        <!-- NEW: Global Next Movie Banner -->
+        <div class="global-next-banner" id="global-next-banner">
+            <div>Scanning all halls...</div>
         </div>
 
         <!-- Tab Controls -->
@@ -581,13 +669,36 @@
                 saveToStorage();
                 renderTable();
                 updateCountdownDisplay();
+                updateGlobalNextMovie();
                 alert("All hall data has been cleared.");
+            }
+        }
+
+        // --- OVERLAY MODAL & VIBRATION LOGIC ---
+        function showModalAlert(hall, title, message) {
+            var modal = document.getElementById('alert-modal');
+            
+            document.getElementById('modal-title').innerText = "🚨 HALL " + hall + " ALERT 🚨";
+            document.getElementById('modal-desc').innerText = message + "\n\nMovie: " + title;
+            
+            modal.style.display = 'flex';
+            
+            // Trigger 4-second vibration if the browser supports it
+            if (navigator.vibrate) {
+                navigator.vibrate(4000);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('alert-modal').style.display = 'none';
+            // Stop vibration immediately if the user clicks before 4 seconds is up
+            if (navigator.vibrate) {
+                navigator.vibrate(0);
             }
         }
 
         // Setup UI
         function init() {
-            // Load saved data before rendering!
             loadFromStorage();
 
             var sidebar = document.getElementById('sidebar');
@@ -816,11 +927,12 @@
             }
 
             hallData[activeHall] = newSchedule;
-            saveToStorage(); // Save after updating
+            saveToStorage(); 
             
             document.getElementById('schedule-input').value = ''; 
             renderTable();
             updateCountdownDisplay();
+            updateGlobalNextMovie();
         }
 
         function markDone(slotIndex, checkNum) {
@@ -829,7 +941,7 @@
             else if (checkNum === 2) { hallData[activeHall][slotIndex].done2 = true; } 
             else if (checkNum === 3) { hallData[activeHall][slotIndex].done3 = true; }
             
-            saveToStorage(); // Save progress
+            saveToStorage(); 
             
             renderTable();
             updateCountdownDisplay();
@@ -907,6 +1019,7 @@
                 
                 checkReminders(klTimeLogic);
                 updateCountdownDisplay();
+                updateGlobalNextMovie(); // constantly update the top banner
             }, 1000); 
         }
 
@@ -926,6 +1039,54 @@
             var difference = target - now;
             var seconds = Math.floor(difference / 1000);
             return seconds;
+        }
+        
+        // NEW FUNCTION: Scans all halls to find the absolute closest starting movie
+        function updateGlobalNextMovie() {
+            var minSeconds = 9999999;
+            var nextHall = "";
+            var nextTime = "";
+            var nextTitle = "";
+            var foundAny = false;
+
+            // Loop through all 11 halls
+            for (var h = 1; h <= totalHalls; h = h + 1) {
+                var sched = hallData[h];
+                if (sched) {
+                    for (var i = 0; i < sched.length; i = i + 1) {
+                        var secondsRemaining = getSecondsRemaining(sched[i].start);
+                        
+                        // We only want movies starting in the future (secondsRemaining > 0)
+                        if (secondsRemaining > 0 && secondsRemaining < minSeconds) {
+                            minSeconds = secondsRemaining;
+                            nextHall = h;
+                            nextTime = sched[i].start;
+                            nextTitle = sched[i].title;
+                            foundAny = true;
+                        }
+                    }
+                }
+            }
+
+            var banner = document.getElementById('global-next-banner');
+            
+            if (foundAny === false) {
+                banner.innerHTML = "<div>No upcoming movies scheduled for today.</div>";
+                return;
+            }
+            
+            var minutesLeft = Math.floor(minSeconds / 60);
+            var timeText = "";
+            
+            if (minutesLeft === 0) {
+                timeText = "Starting NOW!";
+            } else {
+                timeText = "In " + minutesLeft + " mins";
+            }
+
+            banner.innerHTML = 
+                "<div>👉 Next Opening: <strong>Hall " + nextHall + "</strong> at " + nextTime + "</div>" +
+                "<div>" + timeText + "</div>";
         }
 
         function updateCountdownDisplay() {
@@ -1034,6 +1195,10 @@
                     var slot = currentSchedule[i];
                     
                     if (slot.cleanTime === currentTime && hasAlert(slot.alerted, 'clean') === false && slot.doneClean === false) {
+                        
+                        // NEW: Trigger the massive overlay modal for cleaning
+                        showModalAlert(hall, slot.title, "CLEANING AND OPEN REQUIRED!");
+                        
                         triggerAlert(hall, slot.title, "HALL CLEANING AND OPEN!", 'warning');
                         slot.alerted.push('clean');
                         saveToStorage(); 
