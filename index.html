@@ -593,7 +593,7 @@
         </div>
     </div>
 
-    <!-- Sidebar for 11 Halls -->
+    <!-- Sidebar for 10 Halls -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">GSC Hall Selector</div>
         <!-- Buttons injected via JS -->
@@ -602,7 +602,7 @@
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="header-panel">
-            <h1 id="current-hall-title">Hall 1 Management</h1>
+            <h1 id="current-hall-title">Hall Management</h1>
             <div class="top-right-controls">
                 <div class="clock" id="live-clock">
                     <div class="clock-12h">--:--:-- --</div>
@@ -619,20 +619,46 @@
 
         <!-- Tab Controls -->
         <div class="tab-container">
-            <button class="tab-btn active" id="tab-schedule-btn" onclick="switchTab('schedule')">Hall Schedule</button>
+            <button class="tab-btn active" id="tab-checklist-btn" onclick="switchTab('checklist')">📋 Master Checklist</button>
+            <button class="tab-btn" id="tab-schedule-btn" onclick="switchTab('schedule')">Hall Schedule</button>
             <button class="tab-btn" id="tab-occupancy-btn" onclick="switchTab('occupancy')">Calculator</button>
             <button class="tab-btn" id="tab-gsc-btn" onclick="switchTab('gsc')">🔗 GSC Web Portal</button>
             <button class="tab-btn" id="tab-temp-btn" onclick="switchTab('temp')">Temp Report</button>
             <button class="tab-btn" id="tab-ahu-btn" onclick="switchTab('ahu')">AHU Report</button>
         </div>
 
-        <!-- ================= VIEW 1: SCHEDULE & CHECKS ================= -->
-        <div id="view-schedule">
-            <div class="countdown-banner" id="countdown-container" style="display: none;">
+        <!-- ================= VIEW 0: MASTER CHECKLIST (NEW) ================= -->
+        <div id="view-checklist">
+            <div class="countdown-banner" id="countdown-container">
                 <div class="countdown-text" id="countdown-label">Next Check: Calculating...</div>
                 <div class="countdown-timer" id="countdown-timer">--:--:--</div>
             </div>
 
+            <div class="input-card">
+                <h2>Master Pending Tasks</h2>
+                <p style="font-size: 0.9rem; color: #7f8c8d;">Sorted by Hall (1-11). Click "Mark Done" to clear tasks.</p>
+                <div class="table-responsive">
+                    <table id="checklist-table">
+                        <thead>
+                            <tr>
+                                <th>Hall</th>
+                                <th>Movie</th>
+                                <th>Task</th>
+                                <th>Target Time</th>
+                                <th>Time Left</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="checklist-body">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 1: SCHEDULE & CHECKS ================= -->
+        <div id="view-schedule" style="display: none;">
             <div class="input-card">
                 <h3>Paste Schedule Output Here</h3>
                 <p style="font-size: 0.9rem; color: #7f8c8d;">Format: HH:MM-HH:MM-Movie Title</p>
@@ -758,18 +784,18 @@
 
     <script>
         // System Data
-        var totalHalls = 11;
+        var activeHalls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11]; // Hall 10 is excluded
         var activeHall = 1;
         var hallData = {};
         var lastAlertedHour = -1; 
 
         var hallCapacities = {
             1: 97, 2: 79, 3: 258, 4: 146, 5: 212,
-            6: 165, 7: 116, 8: 147, 9: 148, 10: 103, 11: 316
+            6: 165, 7: 116, 8: 147, 9: 148, 11: 316
         };
 
-        for (var i = 1; i <= totalHalls; i = i + 1) {
-            hallData[i] = [];
+        for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+            hallData[activeHalls[idx]] = [];
         }
 
         // --- DARK MODE LOGIC ---
@@ -811,11 +837,12 @@
         function clearAllData() {
             var confirmDelete = confirm("Are you sure you want to delete ALL schedules for ALL halls? This cannot be undone.");
             if (confirmDelete === true) {
-                for (var i = 1; i <= totalHalls; i = i + 1) {
-                    hallData[i] = [];
+                for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                    hallData[activeHalls[idx]] = [];
                 }
                 saveToStorage();
                 renderTable();
+                renderChecklist();
                 updateCountdownDisplay();
                 updateGlobalNextMovie();
                 alert("All hall data has been cleared.");
@@ -854,7 +881,8 @@
             loadFromStorage();
 
             var sidebar = document.getElementById('sidebar');
-            for (var i = 1; i <= totalHalls; i = i + 1) {
+            for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                var i = activeHalls[idx];
                 var btn = document.createElement('button');
                 if (i === 1) {
                     btn.className = 'hall-btn active';
@@ -869,6 +897,10 @@
             buildTempTable();
             buildAhuTable(); 
             updateCalculatorView();
+            
+            // Default to Checklist Tab
+            switchTab('checklist');
+            
             startClock();
             renderTable();
         }
@@ -880,19 +912,25 @@
         }
 
         function switchTab(tab) {
+            document.getElementById('view-checklist').style.display = 'none';
             document.getElementById('view-schedule').style.display = 'none';
             document.getElementById('view-occupancy').style.display = 'none';
             document.getElementById('view-gsc').style.display = 'none';
             document.getElementById('view-temp').style.display = 'none';
             document.getElementById('view-ahu').style.display = 'none';
             
+            document.getElementById('tab-checklist-btn').classList.remove('active');
             document.getElementById('tab-schedule-btn').classList.remove('active');
             document.getElementById('tab-occupancy-btn').classList.remove('active');
             document.getElementById('tab-gsc-btn').classList.remove('active');
             document.getElementById('tab-temp-btn').classList.remove('active');
             document.getElementById('tab-ahu-btn').classList.remove('active');
 
-            if (tab === 'schedule') {
+            if (tab === 'checklist') {
+                document.getElementById('view-checklist').style.display = 'block';
+                document.getElementById('tab-checklist-btn').classList.add('active');
+                renderChecklist();
+            } else if (tab === 'schedule') {
                 document.getElementById('view-schedule').style.display = 'block';
                 document.getElementById('tab-schedule-btn').classList.add('active');
             } else if (tab === 'occupancy') {
@@ -925,8 +963,102 @@
             }
             
             renderTable();
-            updateCountdownDisplay();
             updateCalculatorView();
+        }
+
+        // --- NEW CHECKLIST LOGIC ---
+        function renderChecklist() {
+            var tbody = document.getElementById('checklist-body');
+            tbody.innerHTML = '';
+            var taskCount = 0;
+
+            for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                var h = activeHalls[idx];
+                var sched = hallData[h];
+                if (!sched) { continue; }
+
+                for (var i = 0; i < sched.length; i = i + 1) {
+                    var slot = sched[i];
+                    var tasks = [];
+
+                    if (slot.done1 === false) { tasks.push({ type: 1, name: "1st Check", time: slot.check1 }); }
+                    if (slot.done2 === false) { tasks.push({ type: 2, name: "2nd Check", time: slot.check2 }); }
+                    if (slot.done3 === false) { tasks.push({ type: 3, name: "3rd Check", time: slot.check3 }); }
+                    if (slot.doneClean === false) { tasks.push({ type: 'Clean', name: "Clean & Open", time: slot.cleanTime }); }
+
+                    for (var j = 0; j < tasks.length; j = j + 1) {
+                        var t = tasks[j];
+                        taskCount = taskCount + 1;
+
+                        var arg = t.type;
+                        if (typeof arg === 'string') { arg = "'" + arg + "'"; }
+
+                        var tr = document.createElement('tr');
+                        tr.innerHTML = 
+                            "<td><strong>Hall " + h + "</strong></td>" +
+                            "<td>" + slot.title + "</td>" +
+                            "<td><strong>" + t.name + "</strong></td>" +
+                            "<td>" + t.time + "</td>" +
+                            "<td><span class='live-task-timer' data-time='" + t.time + "'>--:--:--</span></td>" +
+                            "<td><button class='action-btn' style='padding:8px 15px; font-size:0.9rem;' onclick=\"markDone(" + h + ", " + i + ", " + arg + ")\">Mark Done</button></td>";
+                        
+                        tbody.appendChild(tr);
+                    }
+                }
+            }
+
+            if (taskCount === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:30px; color:#7f8c8d;'>No pending tasks! All clear.</td></tr>";
+            }
+
+            updateLiveChecklistTimers();
+        }
+
+        function updateLiveChecklistTimers() {
+            var timers = document.getElementsByClassName('live-task-timer');
+            for (var t = 0; t < timers.length; t = t + 1) {
+                var targetTime = timers[t].getAttribute('data-time');
+                var sec = getSecondsRemaining(targetTime);
+
+                if (sec < -3600) {
+                    timers[t].innerText = "EXPIRED";
+                    timers[t].style.color = "#7f8c8d";
+                    continue;
+                }
+
+                var isNegative = false;
+                if (sec < 0) {
+                    isNegative = true;
+                    sec = Math.abs(sec);
+                }
+
+                var hrs = Math.floor(sec / 3600);
+                var mins = Math.floor((sec % 3600) / 60);
+                var s = sec % 60;
+
+                var hrsStr = hrs.toString();
+                var minsStr = mins.toString();
+                var secsStr = s.toString();
+
+                if (hrsStr.length < 2) { hrsStr = "0" + hrsStr; }
+                if (minsStr.length < 2) { minsStr = "0" + minsStr; }
+                if (secsStr.length < 2) { secsStr = "0" + secsStr; }
+
+                var timeString = hrsStr + ":" + minsStr + ":" + secsStr;
+                if (isNegative === true) {
+                    timeString = "-" + timeString;
+                    timers[t].style.color = "var(--danger)";
+                    timers[t].style.fontWeight = "bold";
+                } else if (sec <= 900) { 
+                    timers[t].style.color = "var(--warning)";
+                    timers[t].style.fontWeight = "bold";
+                } else {
+                    timers[t].style.color = ""; 
+                    timers[t].style.fontWeight = "normal";
+                }
+
+                timers[t].innerText = timeString;
+            }
         }
 
         // --- TEMPERATURE REPORT LOGIC ---
@@ -935,7 +1067,8 @@
             var headerRow = "<tr><th>Hall</th><th>Temp</th><th>Adm.</th><th>Closed</th></tr>";
             table.innerHTML = headerRow;
 
-            for (var i = 1; i <= totalHalls; i = i + 1) {
+            for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                var i = activeHalls[idx];
                 var rowHtml = 
                     "<tr>" +
                         "<td><strong>H" + i + "</strong></td>" +
@@ -970,7 +1103,8 @@
             reportText = reportText + "*Time -  " + timeStr + "*\n\n";
             reportText = reportText + "  Temp\n\n";
 
-            for (var i = 1; i <= totalHalls; i = i + 1) {
+            for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                var i = activeHalls[idx];
                 var tempInput = document.getElementById("temp-h" + i).value;
                 var admInput = document.getElementById("adm-h" + i).value;
                 var isClosed = document.getElementById("closed-h" + i).checked;
@@ -1006,7 +1140,7 @@
             var headerRow = "<tr><th>AHU</th><th>In</th><th>Out</th><th>FR</th></tr>";
             table.innerHTML = headerRow;
 
-            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
+            var ahuHalls = [3, 5, 6, 8, 9, 11];
             for (var j = 0; j < ahuHalls.length; j = j + 1) {
                 var i = ahuHalls[j];
                 var rowHtml = 
@@ -1043,7 +1177,7 @@
             reportText = reportText + "*Time -  " + timeStr + "*\n\n";
             reportText = reportText + "  Ahu Reading\n\n";
 
-            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
+            var ahuHalls = [3, 5, 6, 8, 9, 11];
             for (var j = 0; j < ahuHalls.length; j = j + 1) {
                 var i = ahuHalls[j];
                 var inVal = document.getElementById("ahu-in-" + i).value;
@@ -1179,19 +1313,25 @@
             
             document.getElementById('schedule-input').value = ''; 
             renderTable();
+            renderChecklist();
             updateCountdownDisplay();
             updateGlobalNextMovie();
         }
 
-        function markDone(slotIndex, checkNum) {
-            if (checkNum === 'Clean') { hallData[activeHall][slotIndex].doneClean = true; } 
-            else if (checkNum === 1) { hallData[activeHall][slotIndex].done1 = true; } 
-            else if (checkNum === 2) { hallData[activeHall][slotIndex].done2 = true; } 
-            else if (checkNum === 3) { hallData[activeHall][slotIndex].done3 = true; }
+        function markDone(hallNum, slotIndex, checkNum) {
+            if (checkNum === 'Clean') { hallData[hallNum][slotIndex].doneClean = true; } 
+            else if (checkNum === 1) { hallData[hallNum][slotIndex].done1 = true; } 
+            else if (checkNum === 2) { hallData[hallNum][slotIndex].done2 = true; } 
+            else if (checkNum === 3) { hallData[hallNum][slotIndex].done3 = true; }
             
             saveToStorage(); 
             
-            renderTable();
+            if (activeHall === hallNum) {
+                renderTable();
+            }
+            if (document.getElementById('view-checklist').style.display === 'block') {
+                renderChecklist();
+            }
             updateCountdownDisplay();
         }
 
@@ -1206,7 +1346,7 @@
             if (isDone === true) {
                 btnHtml = "<button class='tick-btn' disabled>✓</button>";
             } else {
-                btnHtml = "<button class='tick-btn' onclick=\"markDone(" + slotIndex + ", " + arg + ")\"></button>";
+                btnHtml = "<button class='tick-btn' onclick=\"markDone(" + activeHall + ", " + slotIndex + ", " + arg + ")\"></button>";
             }
             
             var styleText = "";
@@ -1229,11 +1369,8 @@
             
             if (currentSchedule.length === 0) {
                 tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:#7f8c8d; padding:30px;'>No schedule loaded for this hall yet. Paste data above.</td></tr>";
-                document.getElementById('countdown-container').style.display = 'none';
                 return;
             }
-
-            document.getElementById('countdown-container').style.display = 'flex';
 
             for (var i = 0; i < currentSchedule.length; i = i + 1) {
                 var slot = currentSchedule[i];
@@ -1278,6 +1415,10 @@
                 checkReminders(klTimeLogic);
                 updateCountdownDisplay();
                 updateGlobalNextMovie(); 
+                
+                if (document.getElementById('view-checklist').style.display === 'block') {
+                    updateLiveChecklistTimers();
+                }
             }, 1000); 
         }
 
@@ -1309,7 +1450,8 @@
         function updateGlobalNextMovie() {
             var upcoming = [];
 
-            for (var h = 1; h <= totalHalls; h = h + 1) {
+            for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                var h = activeHalls[idx];
                 var sched = hallData[h];
                 if (sched) {
                     for (var i = 0; i < sched.length; i = i + 1) {
@@ -1347,37 +1489,41 @@
             banner.innerHTML = htmlText;
         }
 
+        // UPDATED: Now scans across ALL halls for the absolute next task
         function updateCountdownDisplay() {
-            var schedule = hallData[activeHall];
-            if (!schedule || schedule.length === 0) { return; }
-
             var nextTask = null;
             var minSeconds = 9999999;
 
-            for (var i = 0; i < schedule.length; i = i + 1) {
-                var slot = schedule[i];
-                var checks = ['Clean', 1, 2, 3];
-                
-                for (var j = 0; j < checks.length; j = j + 1) {
-                    var num = checks[j];
-                    var isDone = false;
-                    var checkTime = "";
+            for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                var h = activeHalls[idx];
+                var schedule = hallData[h];
+                if (!schedule) { continue; }
+
+                for (var i = 0; i < schedule.length; i = i + 1) {
+                    var slot = schedule[i];
+                    var checks = ['Clean', 1, 2, 3];
                     
-                    if (num === 'Clean') {
-                        isDone = slot.doneClean; checkTime = slot.cleanTime;
-                    } else if (num === 1) {
-                        isDone = slot.done1; checkTime = slot.check1;
-                    } else if (num === 2) {
-                        isDone = slot.done2; checkTime = slot.check2;
-                    } else if (num === 3) {
-                        isDone = slot.done3; checkTime = slot.check3;
-                    }
-                    
-                    if (isDone === false) {
-                        var secondsRemaining = getSecondsRemaining(checkTime);
-                        if (secondsRemaining > -3600 && secondsRemaining < minSeconds) { 
-                            minSeconds = secondsRemaining;
-                            nextTask = { title: slot.title, time: checkTime, checkNum: num };
+                    for (var j = 0; j < checks.length; j = j + 1) {
+                        var num = checks[j];
+                        var isDone = false;
+                        var checkTime = "";
+                        
+                        if (num === 'Clean') {
+                            isDone = slot.doneClean; checkTime = slot.cleanTime;
+                        } else if (num === 1) {
+                            isDone = slot.done1; checkTime = slot.check1;
+                        } else if (num === 2) {
+                            isDone = slot.done2; checkTime = slot.check2;
+                        } else if (num === 3) {
+                            isDone = slot.done3; checkTime = slot.check3;
+                        }
+                        
+                        if (isDone === false) {
+                            var secondsRemaining = getSecondsRemaining(checkTime);
+                            if (secondsRemaining > -3600 && secondsRemaining < minSeconds) { 
+                                minSeconds = secondsRemaining;
+                                nextTask = { hall: h, title: slot.title, time: checkTime, checkNum: num };
+                            }
                         }
                     }
                 }
@@ -1387,7 +1533,7 @@
             var labelDisplay = document.getElementById('countdown-label');
 
             if (nextTask === null) {
-                labelDisplay.innerText = "All tasks completed for Hall " + activeHall + "!";
+                labelDisplay.innerText = "All tasks completed across all halls!";
                 timerDisplay.innerText = "DONE";
                 timerDisplay.className = "countdown-timer";
                 timerDisplay.style.color = "white";
@@ -1407,13 +1553,13 @@
             }
 
             if (minSeconds < 0) {
-                labelDisplay.innerText = "OVERDUE: " + taskName + " - " + nextTask.title + " (" + nextTask.time + ")";
+                labelDisplay.innerText = "OVERDUE: Hall " + nextTask.hall + " - " + taskName + " (" + nextTask.time + ")";
                 timerDisplay.innerText = "00:00:00";
                 
                 if (isCleaning === true) { timerDisplay.className = "countdown-timer cleaning"; } 
                 else { timerDisplay.className = "countdown-timer urgent"; }
             } else {
-                labelDisplay.innerText = "Next: " + taskName + " - " + nextTask.title + " (" + nextTask.time + ")";
+                labelDisplay.innerText = "Next: Hall " + nextTask.hall + " - " + taskName + " (" + nextTask.time + ")";
                 
                 var hrs = Math.floor(minSeconds / 3600);
                 var mins = Math.floor((minSeconds % 3600) / 60);
@@ -1439,7 +1585,8 @@
         }
         
         function checkReminders(currentTime) {
-            for (var hall = 1; hall <= totalHalls; hall = hall + 1) {
+            for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                var hall = activeHalls[idx];
                 var currentSchedule = hallData[hall];
                 
                 for (var i = 0; i < currentSchedule.length; i = i + 1) {
