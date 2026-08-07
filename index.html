@@ -621,9 +621,9 @@
         <div class="tab-container">
             <button class="tab-btn active" id="tab-schedule-btn" onclick="switchTab('schedule')">Hall Schedule</button>
             <button class="tab-btn" id="tab-occupancy-btn" onclick="switchTab('occupancy')">Calculator</button>
+            <button class="tab-btn" id="tab-gsc-btn" onclick="switchTab('gsc')">🔗 GSC Web Portal</button>
             <button class="tab-btn" id="tab-temp-btn" onclick="switchTab('temp')">Temp Report</button>
             <button class="tab-btn" id="tab-ahu-btn" onclick="switchTab('ahu')">AHU Report</button>
-            <button class="tab-btn" id="tab-gsc-btn" onclick="switchTab('gsc')">🔗 GSC Web Portal</button>
         </div>
 
         <!-- ================= VIEW 1: SCHEDULE & CHECKS ================= -->
@@ -648,10 +648,10 @@
                             <th>Movie Title</th>
                             <th>Start</th>
                             <th>End</th>
-                            <th>Clean & Open</th>
                             <th>1st Check</th>
                             <th>2nd Check</th>
                             <th>3rd Check</th>
+                            <th>Clean & Open</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
@@ -688,7 +688,22 @@
             </div>
         </div>
 
-        <!-- ================= VIEW 3: TEMP REPORT GENERATOR ================= -->
+        <!-- ================= VIEW 3: GSC WEBSITE SHORTCUT ================= -->
+        <div id="view-gsc" style="display: none;">
+            <div class="input-card" style="max-width: 700px; margin: 0 auto; text-align: center;">
+                <h2>GSC NU Sentral Official Portal</h2>
+                <p style="font-size: 1rem; color: #7f8c8d; margin-bottom: 25px;">
+                    Tap the button below to launch the GSC web app directly in a new window/tab to check seat admissions manually.
+                </p>
+                <a href="https://epaymentwebapp.gsc.com.my/cinemas/showtime-by-cinemas/223/kuala-lumpur-nu-sentral" target="_blank" style="text-decoration: none;">
+                    <button class="action-btn" style="font-size: 1.2rem; padding: 18px 25px; background-color: var(--accent);">
+                        🚀 Launch GSC Portal (NU Sentral)
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 4: TEMP REPORT GENERATOR ================= -->
         <div id="view-temp" style="display: none;">
             <div class="two-col-container">
                 
@@ -712,7 +727,7 @@
             </div>
         </div>
 
-        <!-- ================= VIEW 4: AHU REPORT GENERATOR ================= -->
+        <!-- ================= VIEW 5: AHU REPORT GENERATOR ================= -->
         <div id="view-ahu" style="display: none;">
             <div class="two-col-container">
                 
@@ -733,21 +748,6 @@
                     <textarea id="ahu-report-output" class="report-textarea" readonly></textarea>
                 </div>
 
-            </div>
-        </div>
-
-        <!-- ================= VIEW 5: GSC WEBSITE SHORTCUT ================= -->
-        <div id="view-gsc" style="display: none;">
-            <div class="input-card" style="max-width: 700px; margin: 0 auto; text-align: center;">
-                <h2>GSC NU Sentral Official Portal</h2>
-                <p style="font-size: 1rem; color: #7f8c8d; margin-bottom: 25px;">
-                    Tap the button below to launch the GSC web app directly in a new window/tab to check seat admissions manually.
-                </p>
-                <a href="https://epaymentwebapp.gsc.com.my/cinemas/showtime-by-cinemas/223/kuala-lumpur-nu-sentral" target="_blank" style="text-decoration: none;">
-                    <button class="action-btn" style="font-size: 1.2rem; padding: 18px 25px; background-color: var(--accent);">
-                        🚀 Launch GSC Portal (NU Sentral)
-                    </button>
-                </a>
             </div>
         </div>
 
@@ -882,15 +882,15 @@
         function switchTab(tab) {
             document.getElementById('view-schedule').style.display = 'none';
             document.getElementById('view-occupancy').style.display = 'none';
+            document.getElementById('view-gsc').style.display = 'none';
             document.getElementById('view-temp').style.display = 'none';
             document.getElementById('view-ahu').style.display = 'none';
-            document.getElementById('view-gsc').style.display = 'none';
             
             document.getElementById('tab-schedule-btn').classList.remove('active');
             document.getElementById('tab-occupancy-btn').classList.remove('active');
+            document.getElementById('tab-gsc-btn').classList.remove('active');
             document.getElementById('tab-temp-btn').classList.remove('active');
             document.getElementById('tab-ahu-btn').classList.remove('active');
-            document.getElementById('tab-gsc-btn').classList.remove('active');
 
             if (tab === 'schedule') {
                 document.getElementById('view-schedule').style.display = 'block';
@@ -899,15 +899,15 @@
                 document.getElementById('view-occupancy').style.display = 'block';
                 document.getElementById('tab-occupancy-btn').classList.add('active');
                 document.getElementById('calc-admission-input').focus();
+            } else if (tab === 'gsc') {
+                document.getElementById('view-gsc').style.display = 'block';
+                document.getElementById('tab-gsc-btn').classList.add('active');
             } else if (tab === 'temp') {
                 document.getElementById('view-temp').style.display = 'block';
                 document.getElementById('tab-temp-btn').classList.add('active');
             } else if (tab === 'ahu') {
                 document.getElementById('view-ahu').style.display = 'block';
                 document.getElementById('tab-ahu-btn').classList.add('active');
-            } else if (tab === 'gsc') {
-                document.getElementById('view-gsc').style.display = 'block';
-                document.getElementById('tab-gsc-btn').classList.add('active');
             }
         }
 
@@ -1049,6 +1049,10 @@
                 var inVal = document.getElementById("ahu-in-" + i).value;
                 var outVal = document.getElementById("ahu-out-" + i).value;
                 var frVal = document.getElementById("ahu-fr-" + i).value;
+
+                if (inVal === "" && outVal === "" && frVal === "") { 
+                    continue; 
+                }
 
                 if (inVal === "") { inVal = "-"; }
                 if (outVal === "") { outVal = "-"; }
@@ -1239,10 +1243,10 @@
                     "<td><strong>" + slot.title + "</strong></td>" +
                     "<td>" + slot.start + "</td>" +
                     "<td>" + slot.end + "</td>" +
-                    buildCheckCell(slot.cleanTime, slot.doneClean, 'Clean', i) +
                     buildCheckCell(slot.check1, slot.done1, 1, i) +
                     buildCheckCell(slot.check2, slot.done2, 2, i) +
-                    buildCheckCell(slot.check3, slot.done3, 3, i);
+                    buildCheckCell(slot.check3, slot.done3, 3, i) +
+                    buildCheckCell(slot.cleanTime, slot.doneClean, 'Clean', i);
                     
                 tbody.appendChild(tr);
             }
