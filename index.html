@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,6 +25,7 @@
             height: 100vh;
             overflow: hidden;
             flex-direction: row; 
+            transition: background-color 0.3s, color 0.3s;
         }
         
         /* Sidebar layout */
@@ -35,6 +37,7 @@
             flex-direction: column;
             overflow-y: auto;
             flex-shrink: 0;
+            transition: background-color 0.3s;
         }
         .sidebar-header {
             padding: 20px;
@@ -42,6 +45,7 @@
             text-align: center;
             font-weight: bold;
             font-size: 1.2rem;
+            transition: background-color 0.3s;
         }
         .hall-btn {
             padding: 16px 20px;
@@ -183,6 +187,7 @@
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
+            transition: background-color 0.3s;
         }
         .input-card h3, .input-card h2 {
             margin-top: 0;
@@ -200,6 +205,7 @@
             box-sizing: border-box;
             margin-bottom: 12px;
             font-size: 1rem;
+            transition: background-color 0.3s, color 0.3s;
         }
         textarea:focus, input:focus {
             outline: none;
@@ -242,6 +248,7 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             text-align: center;
+            transition: background-color 0.3s, color 0.3s;
         }
         .calc-result-box {
             background-color: #f8f9fa;
@@ -250,6 +257,7 @@
             padding: 20px;
             text-align: center;
             margin-top: 25px;
+            transition: background-color 0.3s;
         }
         .calc-percent {
             font-size: 3rem;
@@ -266,6 +274,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             background: white;
+            transition: background-color 0.3s;
         }
         table {
             width: 100%;
@@ -278,11 +287,13 @@
             text-align: left;
             border-bottom: 1px solid #eee;
             vertical-align: middle;
+            transition: border-color 0.3s;
         }
         th {
             background-color: var(--secondary);
             color: white;
             white-space: nowrap;
+            transition: background-color 0.3s;
         }
         
         /* Temp Report Styling */
@@ -296,6 +307,7 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 1rem;
+            transition: background-color 0.3s, color 0.3s;
         }
         .report-textarea {
             height: 250px;
@@ -437,6 +449,77 @@
             to { transform: translateX(0); }
         }
 
+        /* DARK MODE OVERRIDES */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        body.dark-mode .sidebar {
+            background-color: #1a252f;
+            border-right: 1px solid #333;
+        }
+        body.dark-mode .sidebar-header {
+            background-color: #111;
+        }
+        body.dark-mode .input-card, 
+        body.dark-mode .table-responsive,
+        body.dark-mode .modal-content {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        body.dark-mode th {
+            background-color: #0d1b2a;
+        }
+        body.dark-mode td, body.dark-mode th {
+            border-bottom: 1px solid #333;
+        }
+        body.dark-mode .tab-btn {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+        body.dark-mode .tab-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+        body.dark-mode textarea, 
+        body.dark-mode input[type="text"], 
+        body.dark-mode input[type="number"] {
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+        body.dark-mode .calc-result-box,
+        body.dark-mode .report-textarea {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+        }
+        body.dark-mode .clock-12h,
+        body.dark-mode .input-card p,
+        body.dark-mode .is-done {
+            color: #aaaaaa;
+        }
+        body.dark-mode .header-panel h1,
+        body.dark-mode .input-card h3, 
+        body.dark-mode .input-card h2,
+        body.dark-mode .clock,
+        body.dark-mode .modal-content p,
+        body.dark-mode strong {
+            color: #e0e0e0;
+        }
+        body.dark-mode .is-done {
+            background-color: #1e3a2f;
+        }
+        body.dark-mode .tick-btn {
+            background-color: #444;
+        }
+        body.dark-mode .tick-btn:hover {
+            background-color: #666;
+        }
+        body.dark-mode .is-done .tick-btn {
+            background-color: var(--success);
+        }
+
         /* MOBILE RESPONSIVE RULES */
         @media (max-width: 768px) {
             body { flex-direction: column; }
@@ -449,6 +532,7 @@
                 box-sizing: border-box;
                 scrollbar-width: none;
                 border-bottom: 2px solid var(--secondary);
+                border-right: none !important;
             }
             .sidebar::-webkit-scrollbar { display: none; }
             .sidebar-header { display: none; }
@@ -470,12 +554,6 @@
             }
             .clock { text-align: left; }
             
-            .global-next-banner {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-
             .countdown-banner {
                 flex-direction: column;
                 align-items: flex-start;
@@ -490,6 +568,14 @@
                 right: 5%;
                 left: 5%;
                 width: 90%;
+            }
+            .top-right-controls {
+                display: flex;
+                flex-direction: row-reverse;
+                justify-content: flex-end;
+                width: 100%;
+                align-items: center;
+                gap: 15px;
             }
         }
     </style>
@@ -515,13 +601,16 @@
     <div class="main-content">
         <div class="header-panel">
             <h1 id="current-hall-title">Hall 1 Management</h1>
-            <div class="clock" id="live-clock">
-                <div class="clock-12h">--:--:-- --</div>
-                <div class="clock-24h">--:--:--</div>
+            <div class="top-right-controls" style="display: flex; align-items: center; gap: 20px;">
+                <div class="clock" id="live-clock">
+                    <div class="clock-12h">--:--:-- --</div>
+                    <div class="clock-24h">--:--:--</div>
+                </div>
+                <button id="dark-toggle-btn" onclick="toggleDarkMode()" style="background:none; border:none; font-size:1.8rem; cursor:pointer; -webkit-tap-highlight-color: transparent; padding: 0;">🌙</button>
             </div>
         </div>
 
-        <!-- NEW: Global Next Movie Banner -->
+        <!-- Global Next Movie Banner -->
         <div class="global-next-banner" id="global-next-banner">
             <div>Scanning all halls...</div>
         </div>
@@ -531,6 +620,7 @@
             <button class="tab-btn active" id="tab-schedule-btn" onclick="switchTab('schedule')">Hall Schedule</button>
             <button class="tab-btn" id="tab-occupancy-btn" onclick="switchTab('occupancy')">Calculator</button>
             <button class="tab-btn" id="tab-temp-btn" onclick="switchTab('temp')">Temp Report</button>
+            <button class="tab-btn" id="tab-gsc-btn" onclick="switchTab('gsc')">🔗 GSC Web Portal</button>
         </div>
 
         <!-- ================= VIEW 1: SCHEDULE & CHECKS ================= -->
@@ -621,6 +711,21 @@
             </div>
         </div>
 
+        <!-- ================= VIEW 4: GSC WEBSITE SHORTCUT ================= -->
+        <div id="view-gsc" style="display: none;">
+            <div class="input-card" style="max-width: 700px; margin: 0 auto; text-align: center;">
+                <h2>GSC NU Sentral Official Portal</h2>
+                <p style="font-size: 1rem; color: #7f8c8d; margin-bottom: 25px;">
+                    Tap the button below to launch the GSC web app directly in a new window/tab to check seat admissions manually.
+                </p>
+                <a href="https://epaymentwebapp.gsc.com.my/cinemas/showtime-by-cinemas/223/kuala-lumpur-nu-sentral" target="_blank" style="text-decoration: none;">
+                    <button class="action-btn" style="font-size: 1.2rem; padding: 18px 25px; background-color: var(--accent);">
+                        🚀 Launch GSC Portal (NU Sentral)
+                    </button>
+                </a>
+            </div>
+        </div>
+
     </div>
 
     <!-- Floating Reminder Panel -->
@@ -631,6 +736,7 @@
         var totalHalls = 11;
         var activeHall = 1;
         var hallData = {};
+        var lastAlertedHour = -1; // Prevents duplicate hourly alerts
 
         // Hardcoded capacities
         var hallCapacities = {
@@ -638,9 +744,32 @@
             6: 165, 7: 116, 8: 147, 9: 148, 10: 103, 11: 316
         };
 
-        // Initialize hall data arrays
         for (var i = 1; i <= totalHalls; i = i + 1) {
             hallData[i] = [];
+        }
+
+        // --- DARK MODE LOGIC ---
+        function toggleDarkMode() {
+            var body = document.body;
+            var btn = document.getElementById('dark-toggle-btn');
+            
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                btn.innerText = '🌙';
+                localStorage.setItem('gscDarkMode', 'light');
+            } else {
+                body.classList.add('dark-mode');
+                btn.innerText = '☀️';
+                localStorage.setItem('gscDarkMode', 'dark');
+            }
+        }
+
+        function loadTheme() {
+            var savedTheme = localStorage.getItem('gscDarkMode');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-toggle-btn').innerText = '☀️';
+            }
         }
 
         // --- LOCAL STORAGE LOGIC ---
@@ -673,8 +802,13 @@
         function showModalAlert(hall, title, message) {
             var modal = document.getElementById('alert-modal');
             
-            document.getElementById('modal-title').innerText = "🚨 HALL " + hall + " ALERT 🚨";
-            document.getElementById('modal-desc').innerText = message + "\n\nMovie: " + title;
+            if (hall === "ALL") {
+                document.getElementById('modal-title').innerText = "⏰ HOURLY LOG REMINDER ⏰";
+            } else {
+                document.getElementById('modal-title').innerText = "🚨 HALL " + hall + " ALERT 🚨";
+            }
+            
+            document.getElementById('modal-desc').innerText = message + (title ? "\n\nMovie: " + title : "");
             
             modal.style.display = 'flex';
             
@@ -692,6 +826,7 @@
 
         // Setup UI
         function init() {
+            loadTheme();
             loadFromStorage();
 
             var sidebar = document.getElementById('sidebar');
@@ -723,10 +858,12 @@
             document.getElementById('view-schedule').style.display = 'none';
             document.getElementById('view-occupancy').style.display = 'none';
             document.getElementById('view-temp').style.display = 'none';
+            document.getElementById('view-gsc').style.display = 'none';
             
             document.getElementById('tab-schedule-btn').classList.remove('active');
             document.getElementById('tab-occupancy-btn').classList.remove('active');
             document.getElementById('tab-temp-btn').classList.remove('active');
+            document.getElementById('tab-gsc-btn').classList.remove('active');
 
             if (tab === 'schedule') {
                 document.getElementById('view-schedule').style.display = 'block';
@@ -738,6 +875,9 @@
             } else if (tab === 'temp') {
                 document.getElementById('view-temp').style.display = 'block';
                 document.getElementById('tab-temp-btn').classList.add('active');
+            } else if (tab === 'gsc') {
+                document.getElementById('view-gsc').style.display = 'block';
+                document.getElementById('tab-gsc-btn').classList.add('active');
             }
         }
 
@@ -1029,6 +1169,17 @@
                     "<div class='clock-12h'>" + klTime12Display + "</div>" +
                     "<div class='clock-24h'>" + klTime24Display + "</div>";
                 
+                // HOURLY TOP-OF-THE-HOUR CHECK (e.g. 9:00, 10:00, 11:00)
+                var currentMins = now.getMinutes();
+                var currentSecs = now.getSeconds();
+                var currentHr = now.getHours();
+
+                if (currentMins === 0 && currentSecs === 0 && lastAlertedHour !== currentHr) {
+                    lastAlertedHour = currentHr;
+                    showModalAlert("ALL", "", "⏰ HOURLY CHECK REMINDER!\n\n1. Check admissions on GSC Web Portal.\n2. Collect temperatures from hall walls.");
+                    triggerAlert("ALL", "", "HOURLY TEMP & ADMISSION LOG TIME!", 'warning');
+                }
+
                 checkReminders(klTimeLogic);
                 updateCountdownDisplay();
                 updateGlobalNextMovie(); 
@@ -1060,17 +1211,14 @@
             return false;
         }
 
-        // UPDATED BANNER LOGIC: ONLY shows halls that are 15 mins or less away
         function updateGlobalNextMovie() {
             var upcoming = [];
 
-            // 1. Gather movies ONLY if they are within 15 mins (900 seconds)
             for (var h = 1; h <= totalHalls; h = h + 1) {
                 var sched = hallData[h];
                 if (sched) {
                     for (var i = 0; i < sched.length; i = i + 1) {
                         var sec = getSecondsRemaining(sched[i].start);
-                        // 900 seconds = 15 minutes. We only want movies opening soon!
                         if (sec > 0 && sec <= 900) {
                             var item = { hall: h, time: sched[i].start, seconds: sec };
                             upcoming.push(item);
@@ -1079,7 +1227,6 @@
                 }
             }
 
-            // 2. Sort them so the closest ones are at the top
             upcoming.sort(function(a, b) {
                 return a.seconds - b.seconds;
             });
@@ -1093,7 +1240,6 @@
 
             var htmlText = "<div style='margin-bottom: 5px;'><strong>🟢 Currently Open for Seating:</strong></div>";
             
-            // 3. Show all halls that matched the 15-minute rule
             for (var j = 0; j < upcoming.length; j = j + 1) {
                 var item = upcoming[j];
                 var mins = Math.floor(item.seconds / 60);
@@ -1249,11 +1395,13 @@
                 msgHtml = "<span style='font-size:0.9rem;'>" + message + "</span>";
             }
 
+            var hallHeader = hall === "ALL" ? "System Notification" : "Hall " + hall + " Action Required";
+
             toast.innerHTML = 
                 "<div>" +
-                    "<strong>Hall " + hall + " Action Required</strong><br>" +
+                    "<strong>" + hallHeader + "</strong><br>" +
                     msgHtml + "<br>" +
-                    "<i style='font-size:0.85rem; opacity: 0.9;'>End of: " + title + "</i>" +
+                    (title ? "<i style='font-size:0.85rem; opacity: 0.9;'>End of: " + title + "</i>" : "") +
                 "</div>" +
                 "<button onclick='this.parentElement.remove()'>Dismiss</button>";
                 
