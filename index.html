@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -296,11 +295,14 @@
             transition: background-color 0.3s;
         }
         
-        /* Temp Report Styling */
-        .temp-input-table {
+        /* Input Table Styling (Temp & AHU) */
+        .temp-input-table, .ahu-input-table {
             min-width: 100%; 
         }
-        .temp-input-table input[type="text"], .temp-input-table input[type="number"] {
+        .temp-input-table input[type="text"], 
+        .temp-input-table input[type="number"],
+        .ahu-input-table input[type="number"],
+        .ahu-input-table input[type="text"] {
             width: 100%;
             max-width: 80px;
             padding: 8px;
@@ -310,11 +312,11 @@
             transition: background-color 0.3s, color 0.3s;
         }
         .report-textarea {
-            height: 250px;
+            height: 350px; 
             font-size: 1rem;
             background-color: #f8f9fa;
         }
-        .temp-container {
+        .two-col-container {
             display: flex;
             gap: 20px;
             align-items: flex-start;
@@ -559,8 +561,8 @@
                 align-items: flex-start;
                 gap: 10px;
             }
-            .temp-container { flex-direction: column; }
-            .temp-container > .input-card {
+            .two-col-container { flex-direction: column; }
+            .two-col-container > .input-card {
                 width: 100%;
                 box-sizing: border-box;
             }
@@ -601,7 +603,7 @@
     <div class="main-content">
         <div class="header-panel">
             <h1 id="current-hall-title">Hall 1 Management</h1>
-            <div class="top-right-controls" style="display: flex; align-items: center; gap: 20px;">
+            <div class="top-right-controls">
                 <div class="clock" id="live-clock">
                     <div class="clock-12h">--:--:-- --</div>
                     <div class="clock-24h">--:--:--</div>
@@ -620,6 +622,7 @@
             <button class="tab-btn active" id="tab-schedule-btn" onclick="switchTab('schedule')">Hall Schedule</button>
             <button class="tab-btn" id="tab-occupancy-btn" onclick="switchTab('occupancy')">Calculator</button>
             <button class="tab-btn" id="tab-temp-btn" onclick="switchTab('temp')">Temp Report</button>
+            <button class="tab-btn" id="tab-ahu-btn" onclick="switchTab('ahu')">AHU Report</button>
             <button class="tab-btn" id="tab-gsc-btn" onclick="switchTab('gsc')">🔗 GSC Web Portal</button>
         </div>
 
@@ -687,9 +690,8 @@
 
         <!-- ================= VIEW 3: TEMP REPORT GENERATOR ================= -->
         <div id="view-temp" style="display: none;">
-            <div class="temp-container">
+            <div class="two-col-container">
                 
-                <!-- Left Side: Inputs -->
                 <div class="input-card" style="flex: 1;">
                     <h2>Hourly Temperature Log</h2>
                     <div class="table-responsive" style="box-shadow: none;">
@@ -701,7 +703,6 @@
                     <button class="action-btn" onclick="generateTempReport()">Generate Report & Copy</button>
                 </div>
 
-                <!-- Right Side: Output Box -->
                 <div class="input-card" style="flex: 1;">
                     <h2>Generated Message</h2>
                     <p style="font-size: 0.9rem; color: #7f8c8d;">Review the output here. It will copy automatically when you generate.</p>
@@ -711,7 +712,31 @@
             </div>
         </div>
 
-        <!-- ================= VIEW 4: GSC WEBSITE SHORTCUT ================= -->
+        <!-- ================= VIEW 4: AHU REPORT GENERATOR ================= -->
+        <div id="view-ahu" style="display: none;">
+            <div class="two-col-container">
+                
+                <div class="input-card" style="flex: 1;">
+                    <h2>Hourly AHU Reading</h2>
+                    <div class="table-responsive" style="box-shadow: none;">
+                        <table class="ahu-input-table" id="ahu-table-inputs">
+                            <!-- Filled by JS -->
+                        </table>
+                    </div>
+                    <br>
+                    <button class="action-btn" onclick="generateAhuReport()">Generate AHU Report & Copy</button>
+                </div>
+
+                <div class="input-card" style="flex: 1;">
+                    <h2>Generated Message</h2>
+                    <p style="font-size: 0.9rem; color: #7f8c8d;">Review the output here. It will copy automatically when you generate.</p>
+                    <textarea id="ahu-report-output" class="report-textarea" readonly></textarea>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= VIEW 5: GSC WEBSITE SHORTCUT ================= -->
         <div id="view-gsc" style="display: none;">
             <div class="input-card" style="max-width: 700px; margin: 0 auto; text-align: center;">
                 <h2>GSC NU Sentral Official Portal</h2>
@@ -736,9 +761,8 @@
         var totalHalls = 11;
         var activeHall = 1;
         var hallData = {};
-        var lastAlertedHour = -1; // Prevents duplicate hourly alerts
+        var lastAlertedHour = -1; 
 
-        // Hardcoded capacities
         var hallCapacities = {
             1: 97, 2: 79, 3: 258, 4: 146, 5: 212,
             6: 165, 7: 116, 8: 147, 9: 148, 10: 103, 11: 316
@@ -843,6 +867,7 @@
             }
             
             buildTempTable();
+            buildAhuTable(); 
             updateCalculatorView();
             startClock();
             renderTable();
@@ -858,11 +883,13 @@
             document.getElementById('view-schedule').style.display = 'none';
             document.getElementById('view-occupancy').style.display = 'none';
             document.getElementById('view-temp').style.display = 'none';
+            document.getElementById('view-ahu').style.display = 'none';
             document.getElementById('view-gsc').style.display = 'none';
             
             document.getElementById('tab-schedule-btn').classList.remove('active');
             document.getElementById('tab-occupancy-btn').classList.remove('active');
             document.getElementById('tab-temp-btn').classList.remove('active');
+            document.getElementById('tab-ahu-btn').classList.remove('active');
             document.getElementById('tab-gsc-btn').classList.remove('active');
 
             if (tab === 'schedule') {
@@ -875,6 +902,9 @@
             } else if (tab === 'temp') {
                 document.getElementById('view-temp').style.display = 'block';
                 document.getElementById('tab-temp-btn').classList.add('active');
+            } else if (tab === 'ahu') {
+                document.getElementById('view-ahu').style.display = 'block';
+                document.getElementById('tab-ahu-btn').classList.add('active');
             } else if (tab === 'gsc') {
                 document.getElementById('view-gsc').style.display = 'block';
                 document.getElementById('tab-gsc-btn').classList.add('active');
@@ -902,7 +932,6 @@
         // --- TEMPERATURE REPORT LOGIC ---
         function buildTempTable() {
             var table = document.getElementById("temp-table-inputs");
-            
             var headerRow = "<tr><th>Hall</th><th>Temp</th><th>Adm.</th><th>Closed</th></tr>";
             table.innerHTML = headerRow;
 
@@ -920,7 +949,6 @@
 
         function generateTempReport() {
             var now = new Date();
-            
             var day = now.getDate().toString();
             var month = (now.getMonth() + 1).toString();
             var year = now.getFullYear().toString();
@@ -931,7 +959,6 @@
 
             var hours = now.getHours();
             var ampm = "AM";
-            
             if (hours >= 12) {
                 ampm = "PM";
                 if (hours > 12) { hours = hours - 12; }
@@ -968,11 +995,76 @@
 
             var outputBox = document.getElementById("temp-report-output");
             outputBox.value = reportText;
-
             outputBox.select();
             document.execCommand("copy");
+            alert("Temp Report generated and copied to clipboard!");
+        }
+
+        // --- AHU REPORT LOGIC (HARDCODED HALLS) ---
+        function buildAhuTable() {
+            var table = document.getElementById("ahu-table-inputs");
+            var headerRow = "<tr><th>AHU</th><th>In</th><th>Out</th><th>FR</th></tr>";
+            table.innerHTML = headerRow;
+
+            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
+            for (var j = 0; j < ahuHalls.length; j = j + 1) {
+                var i = ahuHalls[j];
+                var rowHtml = 
+                    "<tr>" +
+                        "<td><strong>" + i + "</strong></td>" +
+                        "<td><input type='number' id='ahu-in-" + i + "' placeholder='In'></td>" +
+                        "<td><input type='number' id='ahu-out-" + i + "' placeholder='Out'></td>" +
+                        "<td><input type='text' id='ahu-fr-" + i + "' placeholder='FR'></td>" +
+                    "</tr>";
+                table.innerHTML = table.innerHTML + rowHtml;
+            }
+        }
+
+        function generateAhuReport() {
+            var now = new Date();
+            var day = now.getDate().toString();
+            var month = (now.getMonth() + 1).toString();
+            var year = now.getFullYear().toString();
             
-            alert("Report generated and copied to clipboard!");
+            if (day.length < 2) { day = "0" + day; }
+            if (month.length < 2) { month = "0" + month; }
+            var dateStr = day + "/" + month + "/" + year;
+
+            var hours = now.getHours();
+            var ampm = "AM";
+            if (hours >= 12) {
+                ampm = "PM";
+                if (hours > 12) { hours = hours - 12; }
+            }
+            if (hours === 0) { hours = 12; }
+            var timeStr = hours + " " + ampm;
+
+            var reportText = "*Date - " + dateStr + "*\n";
+            reportText = reportText + "*Time -  " + timeStr + "*\n\n";
+            reportText = reportText + "  Ahu Reading\n\n";
+
+            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
+            for (var j = 0; j < ahuHalls.length; j = j + 1) {
+                var i = ahuHalls[j];
+                var inVal = document.getElementById("ahu-in-" + i).value;
+                var outVal = document.getElementById("ahu-out-" + i).value;
+                var frVal = document.getElementById("ahu-fr-" + i).value;
+
+                if (inVal === "") { inVal = "-"; }
+                if (outVal === "") { outVal = "-"; }
+                if (frVal === "") { frVal = "-"; }
+
+                reportText = reportText + "Ahu : " + i + "\n";
+                reportText = reportText + "In : " + inVal + "\n";
+                reportText = reportText + "Out : " + outVal + "\n";
+                reportText = reportText + "Fr : " + frVal + "\n\n";
+            }
+
+            var outputBox = document.getElementById("ahu-report-output");
+            outputBox.value = reportText;
+            outputBox.select();
+            document.execCommand("copy");
+            alert("AHU Report generated and copied to clipboard!");
         }
 
         // --- CALCULATOR LOGIC ---
@@ -1169,15 +1261,14 @@
                     "<div class='clock-12h'>" + klTime12Display + "</div>" +
                     "<div class='clock-24h'>" + klTime24Display + "</div>";
                 
-                // HOURLY TOP-OF-THE-HOUR CHECK (e.g. 9:00, 10:00, 11:00)
                 var currentMins = now.getMinutes();
                 var currentSecs = now.getSeconds();
                 var currentHr = now.getHours();
 
                 if (currentMins === 0 && currentSecs === 0 && lastAlertedHour !== currentHr) {
                     lastAlertedHour = currentHr;
-                    showModalAlert("ALL", "", "⏰ HOURLY CHECK REMINDER!\n\n1. Check admissions on GSC Web Portal.\n2. Collect temperatures from hall walls.");
-                    triggerAlert("ALL", "", "HOURLY TEMP & ADMISSION LOG TIME!", 'warning');
+                    showModalAlert("ALL", "", "⏰ HOURLY CHECK REMINDER!\n\n1. Check admissions on GSC Web Portal.\n2. Collect temperatures & AHU from hall walls.");
+                    triggerAlert("ALL", "", "HOURLY LOG TIME!", 'warning');
                 }
 
                 checkReminders(klTimeLogic);
@@ -1395,13 +1486,22 @@
                 msgHtml = "<span style='font-size:0.9rem;'>" + message + "</span>";
             }
 
-            var hallHeader = hall === "ALL" ? "System Notification" : "Hall " + hall + " Action Required";
+            var hallHeader = "";
+            if (hall === "ALL") {
+                hallHeader = "System Notification";
+            } else {
+                hallHeader = "Hall " + hall + " Action Required";
+            }
+
+            var titleHtml = "";
+            if (title) {
+                titleHtml = "<i style='font-size:0.85rem; opacity: 0.9;'>End of: " + title + "</i>";
+            }
 
             toast.innerHTML = 
                 "<div>" +
                     "<strong>" + hallHeader + "</strong><br>" +
-                    msgHtml + "<br>" +
-                    (title ? "<i style='font-size:0.85rem; opacity: 0.9;'>End of: " + title + "</i>" : "") +
+                    msgHtml + "<br>" + titleHtml +
                 "</div>" +
                 "<button onclick='this.parentElement.remove()'>Dismiss</button>";
                 
