@@ -23,7 +23,7 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
-            flex-direction: row; /* Default for desktop */
+            flex-direction: row; 
         }
         
         /* Sidebar layout */
@@ -103,10 +103,10 @@
             padding-bottom: 10px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         .tab-container::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
+            display: none;
         }
         .tab-btn {
             background-color: #e0e0e0;
@@ -209,6 +209,12 @@
             -webkit-tap-highlight-color: transparent;
         }
         button.action-btn:hover { background-color: #27ae60; }
+        
+        button.danger-btn {
+            background-color: var(--danger);
+            margin-top: 10px;
+        }
+        button.danger-btn:hover { background-color: #c0392b; }
 
         /* Calculator Styling */
         .calc-row {
@@ -255,7 +261,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.95rem;
-            min-width: 600px; /* Forces scrolling on small screens instead of squishing */
+            min-width: 600px; 
         }
         th, td {
             padding: 15px 12px;
@@ -271,7 +277,7 @@
         
         /* Temp Report Styling */
         .temp-input-table {
-            min-width: 100%; /* Overrides the 600px min-width for the temp table */
+            min-width: 100%; 
         }
         .temp-input-table input[type="text"], .temp-input-table input[type="number"] {
             width: 100%;
@@ -369,15 +375,9 @@
             to { transform: translateX(0); }
         }
 
-        /* =========================================
-           MOBILE RESPONSIVE RULES 
-           ========================================= */
+        /* MOBILE RESPONSIVE RULES */
         @media (max-width: 768px) {
-            body {
-                flex-direction: column; /* Stack vertically */
-            }
-            
-            /* Turn Sidebar into a horizontal scrollable top nav */
+            body { flex-direction: column; }
             .sidebar {
                 width: 100%;
                 height: auto;
@@ -388,12 +388,8 @@
                 scrollbar-width: none;
                 border-bottom: 2px solid var(--secondary);
             }
-            .sidebar::-webkit-scrollbar {
-                display: none;
-            }
-            .sidebar-header {
-                display: none; /* Hide title to save space on mobile */
-            }
+            .sidebar::-webkit-scrollbar { display: none; }
+            .sidebar-header { display: none; }
             .hall-btn {
                 border-bottom: none;
                 white-space: nowrap;
@@ -404,37 +400,23 @@
                 background-color: transparent;
                 color: var(--accent);
             }
-
-            /* Adjust Main Content Area */
-            .main-content {
-                padding: 15px;
-            }
+            .main-content { padding: 15px; }
             .header-panel {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
             }
-            .clock {
-                text-align: left;
-            }
-
-            /* Adjust Banner */
+            .clock { text-align: left; }
             .countdown-banner {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
             }
-            
-            /* Stack the Temperature Report Columns */
-            .temp-container {
-                flex-direction: column;
-            }
+            .temp-container { flex-direction: column; }
             .temp-container > .input-card {
                 width: 100%;
                 box-sizing: border-box;
             }
-
-            /* Center alerts on mobile */
             .reminder-panel {
                 right: 5%;
                 left: 5%;
@@ -480,6 +462,7 @@
                 <p style="font-size: 0.9rem; color: #7f8c8d;">Format: HH:MM-HH:MM-Movie Title</p>
                 <textarea id="schedule-input" placeholder="12:25-14:50-Spider-Man: Brand New Day"></textarea>
                 <button class="action-btn" onclick="parseAndSaveSchedule()">Load Schedule into Hall</button>
+                <button class="action-btn danger-btn" onclick="clearAllData()">🗑️ Clear ALL Halls Data</button>
             </div>
 
             <div class="table-responsive">
@@ -577,8 +560,36 @@
             hallData[i] = [];
         }
 
+        // --- LOCAL STORAGE LOGIC ---
+        function saveToStorage() {
+            localStorage.setItem('gscCinemaData', JSON.stringify(hallData));
+        }
+
+        function loadFromStorage() {
+            var savedData = localStorage.getItem('gscCinemaData');
+            if (savedData) {
+                hallData = JSON.parse(savedData);
+            }
+        }
+
+        function clearAllData() {
+            var confirmDelete = confirm("Are you sure you want to delete ALL schedules for ALL halls? This cannot be undone.");
+            if (confirmDelete === true) {
+                for (var i = 1; i <= totalHalls; i = i + 1) {
+                    hallData[i] = [];
+                }
+                saveToStorage();
+                renderTable();
+                updateCountdownDisplay();
+                alert("All hall data has been cleared.");
+            }
+        }
+
         // Setup UI
         function init() {
+            // Load saved data before rendering!
+            loadFromStorage();
+
             var sidebar = document.getElementById('sidebar');
             for (var i = 1; i <= totalHalls; i = i + 1) {
                 var btn = document.createElement('button');
@@ -666,7 +677,6 @@
         function generateTempReport() {
             var now = new Date();
             
-            // Format Date (DD/MM/YYYY)
             var day = now.getDate().toString();
             var month = (now.getMonth() + 1).toString();
             var year = now.getFullYear().toString();
@@ -675,7 +685,6 @@
             if (month.length < 2) { month = "0" + month; }
             var dateStr = day + "/" + month + "/" + year;
 
-            // Format Time (12 Hour PM/AM based on current hour)
             var hours = now.getHours();
             var ampm = "AM";
             
@@ -686,7 +695,6 @@
             if (hours === 0) { hours = 12; }
             var timeStr = hours + " " + ampm;
 
-            // Build Message
             var reportText = "*Date - " + dateStr + "*\n";
             reportText = reportText + "*Time -  " + timeStr + "*\n\n";
             reportText = reportText + "  Temp\n\n";
@@ -717,7 +725,6 @@
             var outputBox = document.getElementById("temp-report-output");
             outputBox.value = reportText;
 
-            // Auto Copy to Clipboard
             outputBox.select();
             document.execCommand("copy");
             
@@ -809,6 +816,8 @@
             }
 
             hallData[activeHall] = newSchedule;
+            saveToStorage(); // Save after updating
+            
             document.getElementById('schedule-input').value = ''; 
             renderTable();
             updateCountdownDisplay();
@@ -819,6 +828,8 @@
             else if (checkNum === 1) { hallData[activeHall][slotIndex].done1 = true; } 
             else if (checkNum === 2) { hallData[activeHall][slotIndex].done2 = true; } 
             else if (checkNum === 3) { hallData[activeHall][slotIndex].done3 = true; }
+            
+            saveToStorage(); // Save progress
             
             renderTable();
             updateCountdownDisplay();
@@ -1025,18 +1036,22 @@
                     if (slot.cleanTime === currentTime && hasAlert(slot.alerted, 'clean') === false && slot.doneClean === false) {
                         triggerAlert(hall, slot.title, "HALL CLEANING AND OPEN!", 'warning');
                         slot.alerted.push('clean');
+                        saveToStorage(); 
                     }
                     if (slot.check1 === currentTime && hasAlert(slot.alerted, 'c1') === false && slot.done1 === false) {
                         triggerAlert(hall, slot.title, "1st Check (Take Temperature!)", 'danger');
                         slot.alerted.push('c1');
+                        saveToStorage(); 
                     }
                     if (slot.check2 === currentTime && hasAlert(slot.alerted, 'c2') === false && slot.done2 === false) {
                         triggerAlert(hall, slot.title, "2nd Check (Piracy Check)", 'danger');
                         slot.alerted.push('c2');
+                        saveToStorage(); 
                     }
                     if (slot.check3 === currentTime && hasAlert(slot.alerted, 'c3') === false && slot.done3 === false) {
                         triggerAlert(hall, slot.title, "3rd Check (Piracy Check)", 'danger');
                         slot.alerted.push('c3');
+                        saveToStorage(); 
                     }
                 }
             }
