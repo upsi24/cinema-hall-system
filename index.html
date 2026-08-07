@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Hall Check & Reminder System</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --danger: #e74c3c;
+            --warning: #f39c12; 
+            --success: #2ecc71;
+            --light: #ecf0f1;
+            --done-bg: #d5f5e3;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f6fa;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Sidebar layout */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 20px;
+            background-color: #1a252f;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .hall-btn {
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--secondary);
+            color: #bdc3c7;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .hall-btn:hover, .hall-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .header-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .clock {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: right;
+            line-height: 1.2;
+        }
+        .clock-12h {
+            font-size: 1rem;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+
+        /* Tab Navigation */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            background-color: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab-btn:hover {
+            background-color: #bdc3c7;
+        }
+        .tab-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Countdown Banner */
+        .countdown-banner {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .countdown-text {
+            font-size: 1.2rem;
+        }
+        .countdown-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--success);
+            font-variant-numeric: tabular-nums;
+        }
+        .countdown-timer.urgent {
+            color: var(--danger);
+            animation: pulse 1s infinite;
+        }
+        .countdown-timer.cleaning {
+            color: var(--warning);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Input Cards */
+        .input-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+            resize: vertical;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        button.action-btn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        button.action-btn:hover { background-color: #27ae60; }
+
+        /* Calculator Styling */
+        .calc-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .calc-input {
+            font-size: 1.2rem;
+            padding: 8px;
+            width: 120px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .calc-result-box {
+            background-color: #f8f9fa;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .calc-percent {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin: 10px 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 0.95rem;
+        }
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+        }
+        th {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        /* Temp Report Styling */
+        .temp-input-table input[type="text"], .temp-input-table input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .report-textarea {
+            height: 300px;
+            font-size: 1.1rem;
+            background-color: #f8f9fa;
+        }
+
+        /* Check Item Styling */
+        .check-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tick-btn {
+            background-color: #bdc3c7;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .tick-btn:hover { background-color: #95a5a6; }
+        
+        .is-done {
+            background-color: var(--done-bg);
+            color: #7f8c8d;
+        }
+        .is-done .time-text {
+            text-decoration: line-through;
+        }
+        .is-done .tick-btn {
+            background-color: var(--success);
+            cursor: default;
+        }
+
+        /* Reminder Panel */
+        .reminder-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            z-index: 1000;
+        }
+        .alert-toast {
+            background-color: var(--danger);
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.5s ease-out;
+            border-left: 5px solid rgba(0,0,0,0.2);
+        }
+        .alert-toast.warning {
+            background-color: var(--warning);
+            color: #fff;
+        }
+        .alert-toast button {
+            background: none;
+            border: 1px solid white;
+            color: white;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .alert-toast button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(120%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar for 11 Halls -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">GSC Hall Selector</div>
+        <!-- Buttons injected via JS -->
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="header-panel">
+            <h1 id="current-hall-title">Hall 1 Management</h1>
+            <div class="clock" id="live-clock">
+                <div class="clock-12h">--:--:-- --</div>
+                <div class="clock-24h">--:--:--</div>
+            </div>
+        </div>
+
+        <!-- Tab Controls -->
+        <div class="tab-container">
+            <button class="tab-btn active" id="tab-schedule-btn" onclick="switchTab('schedule')">Hall Schedule</button>
+            <button class="tab-btn" id="tab-occupancy-btn" onclick="switchTab('occupancy')">Calculator</button>
+            <button class="tab-btn" id="tab-temp-btn" onclick="switchTab('temp')">Temp Report</button>
+        </div>
+
+        <!-- ================= VIEW 1: SCHEDULE & CHECKS ================= -->
+        <div id="view-schedule">
+            <div class="countdown-banner" id="countdown-container" style="display: none;">
+                <div class="countdown-text" id="countdown-label">Next Check: Calculating...</div>
+                <div class="countdown-timer" id="countdown-timer">--:--:--</div>
+            </div>
+
+            <div class="input-card">
+                <h3>Paste Schedule Output Here</h3>
+                <p style="font-size: 0.9rem; color: #7f8c8d;">Format: HH:MM-HH:MM-Movie Title</p>
+                <textarea id="schedule-input" placeholder="12:25-14:50-Spider-Man: Brand New Day"></textarea>
+                <button class="action-btn" onclick="parseAndSaveSchedule()">Load Schedule into Hall</button>
+            </div>
+
+            <table id="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Movie Title</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Clean & Open</th>
+                        <th>1st Check</th>
+                        <th>2nd Check</th>
+                        <th>3rd Check</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ================= VIEW 2: OCCUPANCY CALCULATOR ================= -->
+        <div id="view-occupancy" style="display: none;">
+            <div class="input-card" style="max-width: 600px; margin: 0 auto;">
+                <h2 style="margin-top: 0; color: var(--primary);">Calculation Occupancy Rate</h2>
+                
+                <div class="calc-row">
+                    <strong>Selected Hall:</strong> 
+                    <span id="calc-hall-name" style="color: var(--accent); font-weight: bold;">Hall 1</span>
+                </div>
+                
+                <div class="calc-row">
+                    <strong>Capacity Hall (Seat):</strong> 
+                    <span id="calc-capacity-display" style="font-size: 1.5rem; font-weight: bold;">97</span>
+                </div>
+
+                <div class="calc-row" style="margin-top: 25px;">
+                    <strong>Admission (Customer):</strong>
+                    <input type="number" id="calc-admission-input" class="calc-input" placeholder="e.g. 112" oninput="calculateOccupancy()">
+                </div>
+
+                <div class="calc-result-box">
+                    <div style="font-size: 1.2rem; color: #7f8c8d;">% Occupancy Rate</div>
+                    <div class="calc-percent" id="calc-result-display">0%</div>
+                    <div style="font-size: 0.9rem; color: #95a5a6; font-style: italic;">(Bundarkan kepada No Bulat / Rounded to whole number)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 3: TEMP REPORT GENERATOR ================= -->
+        <div id="view-temp" style="display: none;">
+            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                
+                <!-- Left Side: Inputs -->
+                <div class="input-card" style="flex: 1;">
+                    <h2 style="margin-top: 0; color: var(--primary);">Hourly Temperature Log</h2>
+                    <table class="temp-input-table" id="temp-table-inputs">
+                        <!-- Filled by JS -->
+                    </table>
+                    <br>
+                    <button class="action-btn" onclick="generateTempReport()">Generate Report & Copy</button>
+                </div>
+
+                <!-- Right Side: Output Box -->
+                <div class="input-card" style="flex: 1;">
+                    <h2 style="margin-top: 0; color: var(--primary);">Generated Message</h2>
+                    <p style="font-size: 0.9rem; color: #7f8c8d;">Review the output here. It will copy automatically when you generate.</p>
+                    <textarea id="temp-report-output" class="report-textarea" readonly></textarea>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Reminder Panel -->
+    <div class="reminder-panel" id="reminder-panel"></div>
+
+    <script>
+        // System Data
+        var totalHalls = 11;
+        var activeHall = 1;
+        var hallData = {};
+
+        // Hardcoded capacities
+        var hallCapacities = {
+            1: 97, 2: 79, 3: 258, 4: 146, 5: 212,
+            6: 165, 7: 116, 8: 147, 9: 148, 10: 103, 11: 316
+        };
+
+        // Initialize hall data arrays
+        for (var i = 1; i <= totalHalls; i = i + 1) {
+            hallData[i] = [];
+        }
+
+        // Setup UI
+        function init() {
+            var sidebar = document.getElementById('sidebar');
+            for (var i = 1; i <= totalHalls; i = i + 1) {
+                var btn = document.createElement('button');
+                if (i === 1) {
+                    btn.className = 'hall-btn active';
+                } else {
+                    btn.className = 'hall-btn';
+                }
+                btn.innerText = "Hall " + i;
+                btn.onclick = createClickHandler(i, btn);
+                sidebar.appendChild(btn);
+            }
+            
+            buildTempTable();
+            updateCalculatorView();
+            startClock();
+            renderTable();
+        }
+
+        function createClickHandler(hallNum, btnElem) {
+            return function() {
+                selectHall(hallNum, btnElem);
+            };
+        }
+
+        function switchTab(tab) {
+            document.getElementById('view-schedule').style.display = 'none';
+            document.getElementById('view-occupancy').style.display = 'none';
+            document.getElementById('view-temp').style.display = 'none';
+            
+            document.getElementById('tab-schedule-btn').classList.remove('active');
+            document.getElementById('tab-occupancy-btn').classList.remove('active');
+            document.getElementById('tab-temp-btn').classList.remove('active');
+
+            if (tab === 'schedule') {
+                document.getElementById('view-schedule').style.display = 'block';
+                document.getElementById('tab-schedule-btn').classList.add('active');
+            } else if (tab === 'occupancy') {
+                document.getElementById('view-occupancy').style.display = 'block';
+                document.getElementById('tab-occupancy-btn').classList.add('active');
+                document.getElementById('calc-admission-input').focus();
+            } else if (tab === 'temp') {
+                document.getElementById('view-temp').style.display = 'block';
+                document.getElementById('tab-temp-btn').classList.add('active');
+            }
+        }
+
+        function selectHall(hallNumber, btnElement) {
+            activeHall = hallNumber;
+            document.getElementById('current-hall-title').innerText = "Hall " + hallNumber + " Management";
+            document.getElementById('schedule-input').value = ""; 
+            
+            var buttons = document.querySelectorAll('.hall-btn');
+            for (var i = 0; i < buttons.length; i = i + 1) {
+                buttons[i].classList.remove('active');
+            }
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+            
+            renderTable();
+            updateCountdownDisplay();
+            updateCalculatorView();
+        }
+
+        // --- TEMPERATURE REPORT LOGIC ---
+
+        function buildTempTable() {
+            var table = document.getElementById("temp-table-inputs");
+            
+            var headerRow = "<tr><th>Hall</th><th>Temp (°C)</th><th>Admission</th><th>Status</th></tr>";
+            table.innerHTML = headerRow;
+
+            for (var i = 1; i <= totalHalls; i = i + 1) {
+                var rowHtml = 
+                    "<tr>" +
+                        "<td><strong>Hall " + i + "</strong></td>" +
+                        "<td><input type='text' id='temp-h" + i + "' placeholder='e.g. 21.9'></td>" +
+                        "<td><input type='number' id='adm-h" + i + "' placeholder='e.g. 52'></td>" +
+                        "<td><input type='checkbox' id='closed-h" + i + "'> Closed</td>" +
+                    "</tr>";
+                table.innerHTML = table.innerHTML + rowHtml;
+            }
+        }
+
+        function generateTempReport() {
+            var now = new Date();
+            
+            // Format Date (DD/MM/YYYY)
+            var day = now.getDate().toString();
+            var month = (now.getMonth() + 1).toString();
+            var year = now.getFullYear().toString();
+            
+            if (day.length < 2) { day = "0" + day; }
+            if (month.length < 2) { month = "0" + month; }
+            var dateStr = day + "/" + month + "/" + year;
+
+            // Format Time (12 Hour PM/AM based on current hour)
+            var hours = now.getHours();
+            var ampm = "AM";
+            
+            if (hours >= 12) {
+                ampm = "PM";
+                if (hours > 12) { hours = hours - 12; }
+            }
+            if (hours === 0) { hours = 12; }
+            var timeStr = hours + " " + ampm;
+
+            // Build Message
+            var reportText = "*Date - " + dateStr + "*\n";
+            reportText = reportText + "*Time -  " + timeStr + "*\n\n";
+            reportText = reportText + "  Temp\n\n";
+
+            for (var i = 1; i <= totalHalls; i = i + 1) {
+                var tempInput = document.getElementById("temp-h" + i).value;
+                var admInput = document.getElementById("adm-h" + i).value;
+                var isClosed = document.getElementById("closed-h" + i).checked;
+                
+                var capacity = hallCapacities[i];
+                var admission = parseInt(admInput, 10);
+                var percentage = 0;
+
+                if (tempInput === "") { tempInput = "-"; }
+
+                if (isClosed === true) {
+                    reportText = reportText + "Hall " + i + " : " + tempInput + " (0/0%) CLOSED\n";
+                } else {
+                    if (isNaN(admission) === true || admInput === "") {
+                        admission = 0;
+                    } else {
+                        percentage = Math.round((admission / capacity) * 100);
+                    }
+                    reportText = reportText + "Hall " + i + " : " + tempInput + " (" + admission + "/" + percentage + "%)\n";
+                }
+            }
+
+            var outputBox = document.getElementById("temp-report-output");
+            outputBox.value = reportText;
+
+            // Auto Copy to Clipboard
+            outputBox.select();
+            document.execCommand("copy");
+            
+            alert("Report generated and copied to clipboard!");
+        }
+
+        // --- CALCULATOR LOGIC ---
+        function updateCalculatorView() {
+            var capacity = hallCapacities[activeHall];
+            document.getElementById('calc-hall-name').innerText = "Hall " + activeHall;
+            document.getElementById('calc-capacity-display').innerText = capacity;
+            document.getElementById('calc-admission-input').value = ""; 
+            document.getElementById('calc-result-display').innerText = "0%"; 
+        }
+
+        function calculateOccupancy() {
+            var admissionStr = document.getElementById('calc-admission-input').value;
+            var admission = parseFloat(admissionStr);
+            var capacity = hallCapacities[activeHall];
+            
+            var resultDisplay = document.getElementById('calc-result-display');
+
+            if (isNaN(admission) === true || admissionStr === "") {
+                resultDisplay.innerText = "0%";
+                return;
+            }
+
+            var rawPercentage = (admission / capacity) * 100;
+            var roundedPercentage = Math.round(rawPercentage);
+            
+            resultDisplay.innerText = roundedPercentage + "%";
+        }
+
+        // --- SCHEDULE & CHECKS LOGIC ---
+        function addMinutes(timeString, minsToAdd) {
+            var parts = timeString.split(':');
+            var hours = parseInt(parts[0], 10);
+            var minutes = parseInt(parts[1], 10);
+            
+            var date = new Date();
+            date.setHours(hours, minutes + minsToAdd, 0, 0);
+            
+            var resultHours = date.getHours().toString();
+            var resultMinutes = date.getMinutes().toString();
+            
+            if (resultHours.length < 2) { resultHours = "0" + resultHours; }
+            if (resultMinutes.length < 2) { resultMinutes = "0" + resultMinutes; }
+            
+            return resultHours + ":" + resultMinutes;
+        }
+
+        function parseAndSaveSchedule() {
+            var rawText = document.getElementById('schedule-input').value;
+            var lines = rawText.split('\n');
+            var newSchedule = [];
+
+            for (var i = 0; i < lines.length; i = i + 1) {
+                var line = lines[i].trim();
+                if (line === "") { continue; }
+                
+                var parts = line.split('-');
+                if (parts.length >= 3) {
+                    var start = parts[0].trim();
+                    var end = parts[1].trim();
+                    
+                    var title = "";
+                    for (var j = 2; j < parts.length; j = j + 1) {
+                        title = title + parts[j];
+                        if (j < parts.length - 1) {
+                            title = title + "-";
+                        }
+                    }
+                    title = title.trim();
+
+                    var check1 = addMinutes(start, 15);
+                    var check2 = addMinutes(check1, 35); 
+                    var check3 = addMinutes(check2, 35); 
+
+                    var slot = { 
+                        title: title, start: start, end: end,
+                        cleanTime: end, doneClean: false, 
+                        check1: check1, done1: false, 
+                        check2: check2, done2: false, 
+                        check3: check3, done3: false, 
+                        alerted: [] 
+                    };
+                    newSchedule.push(slot);
+                }
+            }
+
+            hallData[activeHall] = newSchedule;
+            document.getElementById('schedule-input').value = ''; 
+            renderTable();
+            updateCountdownDisplay();
+        }
+
+        function markDone(slotIndex, checkNum) {
+            if (checkNum === 'Clean') { hallData[activeHall][slotIndex].doneClean = true; } 
+            else if (checkNum === 1) { hallData[activeHall][slotIndex].done1 = true; } 
+            else if (checkNum === 2) { hallData[activeHall][slotIndex].done2 = true; } 
+            else if (checkNum === 3) { hallData[activeHall][slotIndex].done3 = true; }
+            
+            renderTable();
+            updateCountdownDisplay();
+        }
+
+        function buildCheckCell(checkTime, isDone, checkNum, slotIndex) {
+            var cellClass = "";
+            if (isDone === true) { cellClass = "is-done"; }
+            
+            var arg = checkNum;
+            if (typeof checkNum === 'string') { arg = "'" + checkNum + "'"; }
+            
+            var btnHtml = "";
+            if (isDone === true) {
+                btnHtml = "<button class='tick-btn' disabled>✓</button>";
+            } else {
+                btnHtml = "<button class='tick-btn' onclick=\"markDone(" + slotIndex + ", " + arg + ")\"></button>";
+            }
+            
+            var styleText = "";
+            if (checkNum === 1 && isDone === false) {
+                styleText = "font-weight:bold; color:var(--accent);";
+            }
+            
+            var html = "<td class='" + cellClass + "'>" +
+                       "<div class='check-cell'>" +
+                       btnHtml +
+                       "<span class='time-text' style='" + styleText + "'>" + checkTime + "</span>" +
+                       "</div></td>";
+            return html;
+        }
+
+        function renderTable() {
+            var tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            var currentSchedule = hallData[activeHall];
+            
+            if (currentSchedule.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:#7f8c8d;'>No schedule loaded for this hall yet. Paste data above.</td></tr>";
+                document.getElementById('countdown-container').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('countdown-container').style.display = 'flex';
+
+            for (var i = 0; i < currentSchedule.length; i = i + 1) {
+                var slot = currentSchedule[i];
+                var tr = document.createElement('tr');
+                
+                tr.innerHTML = 
+                    "<td><strong>" + slot.title + "</strong></td>" +
+                    "<td>" + slot.start + "</td>" +
+                    "<td>" + slot.end + "</td>" +
+                    buildCheckCell(slot.cleanTime, slot.doneClean, 'Clean', i) +
+                    buildCheckCell(slot.check1, slot.done1, 1, i) +
+                    buildCheckCell(slot.check2, slot.done2, 2, i) +
+                    buildCheckCell(slot.check3, slot.done3, 3, i);
+                    
+                tbody.appendChild(tr);
+            }
+        }
+
+        // --- TIMER AND CLOCK LOGIC ---
+        function startClock() {
+            setInterval(function() {
+                var now = new Date();
+                
+                var klTimeLogic = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kuala_Lumpur', hour12: false, hour: '2-digit', minute: '2-digit' });
+                var klTime12Display = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kuala_Lumpur', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                var klTime24Display = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kuala_Lumpur', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                
+                document.getElementById('live-clock').innerHTML = 
+                    "<div class='clock-12h'>" + klTime12Display + "</div>" +
+                    "<div class='clock-24h'>" + klTime24Display + "</div>";
+                
+                checkReminders(klTimeLogic);
+                updateCountdownDisplay();
+            }, 1000); 
+        }
+
+        function getSecondsRemaining(targetTimeStr) {
+            var now = new Date();
+            var parts = targetTimeStr.split(':');
+            var hours = parseInt(parts[0], 10);
+            var minutes = parseInt(parts[1], 10);
+            
+            var target = new Date();
+            target.setHours(hours, minutes, 0, 0);
+
+            if (target < now && now.getHours() > 18 && hours < 6) {
+                target.setDate(target.getDate() + 1);
+            }
+
+            var difference = target - now;
+            var seconds = Math.floor(difference / 1000);
+            return seconds;
+        }
+
+        function updateCountdownDisplay() {
+            var schedule = hallData[activeHall];
+            if (!schedule || schedule.length === 0) { return; }
+
+            var nextTask = null;
+            var minSeconds = 9999999;
+
+            for (var i = 0; i < schedule.length; i = i + 1) {
+                var slot = schedule[i];
+                var checks = ['Clean', 1, 2, 3];
+                
+                for (var j = 0; j < checks.length; j = j + 1) {
+                    var num = checks[j];
+                    var isDone = false;
+                    var checkTime = "";
+                    
+                    if (num === 'Clean') {
+                        isDone = slot.doneClean; checkTime = slot.cleanTime;
+                    } else if (num === 1) {
+                        isDone = slot.done1; checkTime = slot.check1;
+                    } else if (num === 2) {
+                        isDone = slot.done2; checkTime = slot.check2;
+                    } else if (num === 3) {
+                        isDone = slot.done3; checkTime = slot.check3;
+                    }
+                    
+                    if (isDone === false) {
+                        var secondsRemaining = getSecondsRemaining(checkTime);
+                        if (secondsRemaining > -3600 && secondsRemaining < minSeconds) { 
+                            minSeconds = secondsRemaining;
+                            nextTask = { title: slot.title, time: checkTime, checkNum: num };
+                        }
+                    }
+                }
+            }
+
+            var timerDisplay = document.getElementById('countdown-timer');
+            var labelDisplay = document.getElementById('countdown-label');
+
+            if (nextTask === null) {
+                labelDisplay.innerText = "All tasks completed for Hall " + activeHall + "!";
+                timerDisplay.innerText = "DONE";
+                timerDisplay.className = "countdown-timer";
+                timerDisplay.style.color = "white";
+                return;
+            }
+
+            timerDisplay.style.color = ""; 
+            
+            var isCleaning = false;
+            if (nextTask.checkNum === 'Clean') { isCleaning = true; }
+            
+            var taskName = "";
+            if (isCleaning === true) {
+                taskName = "Clean & Open";
+            } else {
+                taskName = "Check " + nextTask.checkNum;
+            }
+
+            if (minSeconds < 0) {
+                labelDisplay.innerText = "OVERDUE: " + taskName + " - " + nextTask.title + " (" + nextTask.time + ")";
+                timerDisplay.innerText = "00:00:00";
+                
+                if (isCleaning === true) { timerDisplay.className = "countdown-timer cleaning"; } 
+                else { timerDisplay.className = "countdown-timer urgent"; }
+            } else {
+                labelDisplay.innerText = "Next: " + taskName + " - " + nextTask.title + " (" + nextTask.time + ")";
+                
+                var hrs = Math.floor(minSeconds / 3600);
+                var mins = Math.floor((minSeconds % 3600) / 60);
+                var secs = minSeconds % 60;
+                
+                var hrsStr = hrs.toString();
+                var minsStr = mins.toString();
+                var secsStr = secs.toString();
+                
+                if (hrsStr.length < 2) { hrsStr = "0" + hrsStr; }
+                if (minsStr.length < 2) { minsStr = "0" + minsStr; }
+                if (secsStr.length < 2) { secsStr = "0" + secsStr; }
+                
+                timerDisplay.innerText = hrsStr + ":" + minsStr + ":" + secsStr;
+                
+                if (minSeconds <= 300) { 
+                    if (isCleaning === true) { timerDisplay.className = "countdown-timer cleaning"; } 
+                    else { timerDisplay.className = "countdown-timer urgent"; }
+                } else {
+                    timerDisplay.className = "countdown-timer";
+                }
+            }
+        }
+        
+        function hasAlert(array, val) {
+            for (var i = 0; i < array.length; i = i + 1) {
+                if (array[i] === val) { return true; }
+            }
+            return false;
+        }
+
+        function checkReminders(currentTime) {
+            for (var hall = 1; hall <= totalHalls; hall = hall + 1) {
+                var currentSchedule = hallData[hall];
+                
+                for (var i = 0; i < currentSchedule.length; i = i + 1) {
+                    var slot = currentSchedule[i];
+                    
+                    if (slot.cleanTime === currentTime && hasAlert(slot.alerted, 'clean') === false && slot.doneClean === false) {
+                        triggerAlert(hall, slot.title, "HALL CLEANING AND OPEN!", 'warning');
+                        slot.alerted.push('clean');
+                    }
+                    if (slot.check1 === currentTime && hasAlert(slot.alerted, 'c1') === false && slot.done1 === false) {
+                        triggerAlert(hall, slot.title, "1st Check (Take Temperature!)", 'danger');
+                        slot.alerted.push('c1');
+                    }
+                    if (slot.check2 === currentTime && hasAlert(slot.alerted, 'c2') === false && slot.done2 === false) {
+                        triggerAlert(hall, slot.title, "2nd Check (Piracy Check)", 'danger');
+                        slot.alerted.push('c2');
+                    }
+                    if (slot.check3 === currentTime && hasAlert(slot.alerted, 'c3') === false && slot.done3 === false) {
+                        triggerAlert(hall, slot.title, "3rd Check (Piracy Check)", 'danger');
+                        slot.alerted.push('c3');
+                    }
+                }
+            }
+        }
+
+        function triggerAlert(hall, title, message, type) {
+            if (!type) { type = 'danger'; }
+            var panel = document.getElementById('reminder-panel');
+            var toast = document.createElement('div');
+            
+            toast.className = "alert-toast " + type;
+            
+            var msgHtml = "";
+            if (type === 'warning') {
+                msgHtml = "<span style='font-size:1.1rem; font-weight:bold;'>" + message + "</span>";
+            } else {
+                msgHtml = "<span style='font-size:0.9rem;'>" + message + "</span>";
+            }
+
+            toast.innerHTML = 
+                "<div>" +
+                    "<strong>Hall " + hall + " Action Required</strong><br>" +
+                    msgHtml + "<br>" +
+                    "<i style='font-size:0.85rem; opacity: 0.9;'>End of: " + title + "</i>" +
+                "</div>" +
+                "<button onclick='this.parentElement.remove()'>Dismiss</button>";
+                
+            panel.appendChild(toast);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
