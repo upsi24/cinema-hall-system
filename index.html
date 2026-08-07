@@ -98,14 +98,9 @@
         .global-next-banner {
             background-color: #1abc9c;
             color: white;
-            padding: 12px 20px;
+            padding: 15px 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
@@ -475,12 +470,6 @@
             }
             .clock { text-align: left; }
             
-            .global-next-banner {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-
             .countdown-banner {
                 flex-direction: column;
                 align-items: flex-start;
@@ -501,7 +490,7 @@
 </head>
 <body>
 
-    <!-- Full Screen Overlay Modal (Hidden by Default) -->
+    <!-- Full Screen Overlay Modal -->
     <div id="alert-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <h2 id="modal-title">🚨 ALERT 🚨</h2>
@@ -683,7 +672,6 @@
             
             modal.style.display = 'flex';
             
-            // Trigger 4-second vibration if the browser supports it
             if (navigator.vibrate) {
                 navigator.vibrate(4000);
             }
@@ -691,7 +679,6 @@
 
         function closeModal() {
             document.getElementById('alert-modal').style.display = 'none';
-            // Stop vibration immediately if the user clicks before 4 seconds is up
             if (navigator.vibrate) {
                 navigator.vibrate(0);
             }
@@ -887,6 +874,23 @@
             return resultHours + ":" + resultMinutes;
         }
 
+        function subtractMinutes(timeString, minsToSubtract) {
+            var parts = timeString.split(':');
+            var hours = parseInt(parts[0], 10);
+            var minutes = parseInt(parts[1], 10);
+            
+            var date = new Date();
+            date.setHours(hours, minutes - minsToSubtract, 0, 0);
+            
+            var resultHours = date.getHours().toString();
+            var resultMinutes = date.getMinutes().toString();
+            
+            if (resultHours.length < 2) { resultHours = "0" + resultHours; }
+            if (resultMinutes.length < 2) { resultMinutes = "0" + resultMinutes; }
+            
+            return resultHours + ":" + resultMinutes;
+        }
+
         function parseAndSaveSchedule() {
             var rawText = document.getElementById('schedule-input').value;
             var lines = rawText.split('\n');
@@ -910,12 +914,14 @@
                     }
                     title = title.trim();
 
+                    var openTime = subtractMinutes(start, 15); 
                     var check1 = addMinutes(start, 15);
                     var check2 = addMinutes(check1, 35); 
                     var check3 = addMinutes(check2, 35); 
 
                     var slot = { 
                         title: title, start: start, end: end,
+                        openTime: openTime, 
                         cleanTime: end, doneClean: false, 
                         check1: check1, done1: false, 
                         check2: check2, done2: false, 
@@ -1019,7 +1025,7 @@
                 
                 checkReminders(klTimeLogic);
                 updateCountdownDisplay();
-                updateGlobalNextMovie(); // constantly update the top banner
+                updateGlobalNextMovie(); 
             }, 1000); 
         }
 
@@ -1041,52 +1047,58 @@
             return seconds;
         }
         
-        // NEW FUNCTION: Scans all halls to find the absolute closest starting movie
+        // NEW UPDATED BANNER LOGIC: Lists all halls opening soon
         function updateGlobalNextMovie() {
-            var minSeconds = 9999999;
-            var nextHall = "";
-            var nextTime = "";
-            var nextTitle = "";
-            var foundAny = false;
+            var upcoming = [];
 
-            // Loop through all 11 halls
+            // 1. Gather all future movies from all halls
             for (var h = 1; h <= totalHalls; h = h + 1) {
                 var sched = hallData[h];
                 if (sched) {
                     for (var i = 0; i < sched.length; i = i + 1) {
-                        var secondsRemaining = getSecondsRemaining(sched[i].start);
-                        
-                        // We only want movies starting in the future (secondsRemaining > 0)
-                        if (secondsRemaining > 0 && secondsRemaining < minSeconds) {
-                            minSeconds = secondsRemaining;
-                            nextHall = h;
-                            nextTime = sched[i].start;
-                            nextTitle = sched[i].title;
-                            foundAny = true;
+                        var sec = getSecondsRemaining(sched[i].start);
+                        if (sec > 0) {
+                            var item = { hall: h, time: sched[i].start, seconds: sec };
+                            upcoming.push(item);
                         }
                     }
                 }
             }
 
+            // 2. Sort them so the closest ones are at the top
+            upcoming.sort(function(a, b) {
+                return a.seconds - b.seconds;
+            });
+
             var banner = document.getElementById('global-next-banner');
             
-            if (foundAny === false) {
+            if (upcoming.length === 0) {
                 banner.innerHTML = "<div>No upcoming movies scheduled for today.</div>";
                 return;
             }
+
+            var htmlText = "<div style='margin-bottom: 5px;'><strong>📋 Upcoming Hall Openings:</strong></div>";
             
-            var minutesLeft = Math.floor(minSeconds / 60);
-            var timeText = "";
-            
-            if (minutesLeft === 0) {
-                timeText = "Starting NOW!";
-            } else {
-                timeText = "In " + minutesLeft + " mins";
+            // 3. Show the next 4 upcoming movies
+            var count = upcoming.length;
+            if (count > 4) { count = 4; } 
+
+            for (var j = 0; j < count; j = j + 1) {
+                var item = upcoming[j];
+                var mins = Math.floor(item.seconds / 60);
+                
+                var statusText = "";
+                // If it is 15 minutes or less away, highlight it bright yellow!
+                if (mins <= 15) {
+                    statusText = "<span style='color:#ffeb3b; font-weight:bold;'> (🟢 SEATING OPEN - Starts in " + mins + " min)</span>";
+                } else {
+                    statusText = "<span style='opacity:0.9;'> (Starts in " + mins + " min)</span>";
+                }
+                
+                htmlText = htmlText + "<div style='margin-top: 5px; font-size: 0.95rem;'>👉 <strong>Hall " + item.hall + "</strong> at " + item.time + statusText + "</div>";
             }
 
-            banner.innerHTML = 
-                "<div>👉 Next Opening: <strong>Hall " + nextHall + "</strong> at " + nextTime + "</div>" +
-                "<div>" + timeText + "</div>";
+            banner.innerHTML = htmlText;
         }
 
         function updateCountdownDisplay() {
@@ -1194,12 +1206,15 @@
                 for (var i = 0; i < currentSchedule.length; i = i + 1) {
                     var slot = currentSchedule[i];
                     
+                    if (slot.openTime === currentTime && hasAlert(slot.alerted, 'open') === false) {
+                        showModalAlert(hall, slot.title, "SEATING OPENING (15 Mins to Start)!");
+                        triggerAlert(hall, slot.title, "HALL OPEN FOR SEATING!", 'warning');
+                        slot.alerted.push('open');
+                        saveToStorage(); 
+                    }
                     if (slot.cleanTime === currentTime && hasAlert(slot.alerted, 'clean') === false && slot.doneClean === false) {
-                        
-                        // NEW: Trigger the massive overlay modal for cleaning
-                        showModalAlert(hall, slot.title, "CLEANING AND OPEN REQUIRED!");
-                        
-                        triggerAlert(hall, slot.title, "HALL CLEANING AND OPEN!", 'warning');
+                        showModalAlert(hall, slot.title, "CLEANING REQUIRED!");
+                        triggerAlert(hall, slot.title, "HALL CLEANING REQUIRED!", 'warning');
                         slot.alerted.push('clean');
                         saveToStorage(); 
                     }
