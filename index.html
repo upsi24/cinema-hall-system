@@ -67,11 +67,11 @@
         /* Main Content */
         .main-content {
             flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+            display: block; /* FIXED: Changed from flex to block to stop mobile squishing */
             padding: 20px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            min-height: 0; /* Ensures proper scrolling */
         }
         .header-panel {
             display: flex;
@@ -117,6 +117,8 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            flex-shrink: 0; /* Force lock height */
+            min-height: 55px; /* Force lock height */
         }
         .tab-container::-webkit-scrollbar {
             display: none;
@@ -133,6 +135,9 @@
             transition: 0.2s;
             white-space: nowrap;
             -webkit-tap-highlight-color: transparent;
+            flex-shrink: 0; /* Stops text cut-off */
+            height: 45px; /* Locked button height */
+            box-sizing: border-box;
         }
         .tab-btn:hover {
             background-color: #bdc3c7;
@@ -556,6 +561,7 @@
                 scrollbar-width: none;
                 border-bottom: 2px solid var(--secondary);
                 border-right: none !important;
+                flex-shrink: 0; /* Stop sidebar from hiding */
             }
             .sidebar::-webkit-scrollbar { display: none; }
             .sidebar-header { display: none; }
@@ -1089,7 +1095,7 @@
             updateCalculatorView();
         }
 
-        // --- NEW CHECKLIST LOGIC ---
+        // --- CHECKLIST LOGIC ---
         function renderChecklist() {
             var tbody = document.getElementById('checklist-body');
             tbody.innerHTML = '';
@@ -1109,7 +1115,6 @@
                 }
             }
 
-            // SORT LOGIC: Strictly by chronological order, so the row positions never change.
             tasks.sort(function(a, b) {
                 return getSecondsRemaining(a.time) - getSecondsRemaining(b.time);
             });
