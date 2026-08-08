@@ -295,7 +295,7 @@
             transition: background-color 0.3s;
         }
 
-        /* Master Checklist Done Styling (Strikethrough) */
+        /* Master Checklist Done Styling */
         .checklist-done {
             background-color: var(--done-bg);
             transition: background-color 0.3s;
@@ -614,7 +614,7 @@
         </div>
     </div>
 
-    <!-- Sidebar for 11 Halls -->
+    <!-- Sidebar for 10 Halls -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">GSC Hall Selector</div>
         <!-- Buttons injected via JS -->
@@ -878,7 +878,6 @@
         function saveFormInputs() {
             var formData = { temp: {}, ahu: {} };
             
-            // Save Temp Inputs
             for (var idx = 0; idx < activeHalls.length; idx++) {
                 var i = activeHalls[idx];
                 var tempEl = document.getElementById("temp-h" + i);
@@ -894,7 +893,6 @@
                 }
             }
             
-            // Save AHU Inputs
             var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
             for (var j = 0; j < ahuHalls.length; j++) {
                 var i = ahuHalls[j];
@@ -919,7 +917,6 @@
             if (!savedData) return;
             var formData = JSON.parse(savedData);
             
-            // Load Temp Inputs
             for (var idx = 0; idx < activeHalls.length; idx++) {
                 var i = activeHalls[idx];
                 if (formData.temp && formData.temp[i]) {
@@ -932,7 +929,6 @@
                 }
             }
             
-            // Load AHU Inputs
             var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
             for (var j = 0; j < ahuHalls.length; j++) {
                 var i = ahuHalls[j];
@@ -1093,7 +1089,7 @@
             updateCalculatorView();
         }
 
-        // --- CHECKLIST LOGIC ---
+        // --- NEW CHECKLIST LOGIC ---
         function renderChecklist() {
             var tbody = document.getElementById('checklist-body');
             tbody.innerHTML = '';
@@ -1113,7 +1109,7 @@
                 }
             }
 
-            // SORT LOGIC: Strictly by chronological order, so the row positions never change
+            // SORT LOGIC: Strictly by chronological order, so the row positions never change.
             tasks.sort(function(a, b) {
                 return getSecondsRemaining(a.time) - getSecondsRemaining(b.time);
             });
@@ -1573,7 +1569,10 @@
             var target = new Date();
             target.setHours(hours, minutes, 0, 0);
 
-            if (target < now && now.getHours() > 18 && hours < 6) {
+            // NEW CINEMA DAY LOGIC:
+            // If the movie is early morning (12am - 6am) but it's currently daytime (6am - 11pm),
+            // it means the movie is actually tomorrow morning!
+            if (hours < 6 && now.getHours() >= 6) {
                 target.setDate(target.getDate() + 1);
             }
 
