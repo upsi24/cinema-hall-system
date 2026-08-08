@@ -295,7 +295,7 @@
             transition: background-color 0.3s;
         }
 
-        /* Master Checklist Done Styling */
+        /* Master Checklist Done Styling (Strikethrough) */
         .checklist-done {
             background-color: var(--done-bg);
             transition: background-color 0.3s;
@@ -303,6 +303,10 @@
         .checklist-done td {
             color: #7f8c8d;
             font-weight: bold;
+            text-decoration: line-through; 
+        }
+        .checklist-done td:last-child {
+            text-decoration: none; 
         }
         
         /* Input Table Styling (Temp & AHU) */
@@ -536,6 +540,7 @@
         }
         body.dark-mode .checklist-done td {
             color: #7f8c8d; 
+            text-decoration: line-through;
         }
 
         /* MOBILE RESPONSIVE RULES */
@@ -609,7 +614,7 @@
         </div>
     </div>
 
-    <!-- Sidebar for 10 Halls -->
+    <!-- Sidebar for 11 Halls -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">GSC Hall Selector</div>
         <!-- Buttons injected via JS -->
@@ -643,7 +648,7 @@
             <button class="tab-btn" id="tab-ahu-btn" onclick="switchTab('ahu')">AHU Report</button>
         </div>
 
-        <!-- ================= VIEW 0: MASTER CHECKLIST (NEW) ================= -->
+        <!-- ================= VIEW 0: MASTER CHECKLIST ================= -->
         <div id="view-checklist">
             <div class="countdown-banner" id="countdown-container">
                 <div class="countdown-text" id="countdown-label">Next Check: Calculating...</div>
@@ -652,7 +657,7 @@
 
             <div class="input-card">
                 <h2>Master Pending Tasks</h2>
-                <p style="font-size: 0.9rem; color: #7f8c8d;">Sorted by time (most urgent at the top). Completed tasks are moved to the bottom in bold grey.</p>
+                <p style="font-size: 0.9rem; color: #7f8c8d;">Chronological timeline. Clicking "Mark Done" crosses the item out in bold grey without moving it.</p>
                 <div class="table-responsive">
                     <table id="checklist-table">
                         <thead>
@@ -758,6 +763,8 @@
                     </div>
                     <br>
                     <button class="action-btn" onclick="generateTempReport()">Generate Report & Copy</button>
+                    <!-- NEW CLEAR BUTTON -->
+                    <button class="action-btn danger-btn" onclick="clearFormInputs('temp')" style="margin-top:10px;">Clear Temp Fields</button>
                 </div>
 
                 <div class="input-card" style="flex: 1;">
@@ -782,6 +789,8 @@
                     </div>
                     <br>
                     <button class="action-btn" onclick="generateAhuReport()">Generate AHU Report & Copy</button>
+                    <!-- NEW CLEAR BUTTON -->
+                    <button class="action-btn danger-btn" onclick="clearFormInputs('ahu')" style="margin-top:10px;">Clear AHU Fields</button>
                 </div>
 
                 <div class="input-card" style="flex: 1;">
@@ -800,14 +809,14 @@
 
     <script>
         // System Data
-        var activeHalls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11]; // Hall 10 is excluded
+        var activeHalls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; 
         var activeHall = 1;
         var hallData = {};
         var lastAlertedHour = -1; 
 
         var hallCapacities = {
             1: 97, 2: 79, 3: 258, 4: 146, 5: 212,
-            6: 165, 7: 116, 8: 147, 9: 148, 11: 316
+            6: 165, 7: 116, 8: 147, 9: 148, 10: 103, 11: 316
         };
 
         for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
@@ -865,6 +874,108 @@
             }
         }
 
+        // --- FORM AUTO-SAVE LOGIC ---
+        function saveFormInputs() {
+            var formData = { temp: {}, ahu: {} };
+            
+            // Save Temp Inputs
+            for (var idx = 0; idx < activeHalls.length; idx++) {
+                var i = activeHalls[idx];
+                var tempEl = document.getElementById("temp-h" + i);
+                var admEl = document.getElementById("adm-h" + i);
+                var closedEl = document.getElementById("closed-h" + i);
+                
+                if (tempEl) {
+                    formData.temp[i] = {
+                        temp: tempEl.value,
+                        adm: admEl.value,
+                        closed: closedEl.checked
+                    };
+                }
+            }
+            
+            // Save AHU Inputs
+            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
+            for (var j = 0; j < ahuHalls.length; j++) {
+                var i = ahuHalls[j];
+                var inEl = document.getElementById("ahu-in-" + i);
+                var outEl = document.getElementById("ahu-out-" + i);
+                var frEl = document.getElementById("ahu-fr-" + i);
+                
+                if (inEl) {
+                    formData.ahu[i] = {
+                        in: inEl.value,
+                        out: outEl.value,
+                        fr: frEl.value
+                    };
+                }
+            }
+            
+            localStorage.setItem('gscFormInputs', JSON.stringify(formData));
+        }
+
+        function loadFormInputs() {
+            var savedData = localStorage.getItem('gscFormInputs');
+            if (!savedData) return;
+            var formData = JSON.parse(savedData);
+            
+            // Load Temp Inputs
+            for (var idx = 0; idx < activeHalls.length; idx++) {
+                var i = activeHalls[idx];
+                if (formData.temp && formData.temp[i]) {
+                    var tempEl = document.getElementById("temp-h" + i);
+                    var admEl = document.getElementById("adm-h" + i);
+                    var closedEl = document.getElementById("closed-h" + i);
+                    if (tempEl) tempEl.value = formData.temp[i].temp || "";
+                    if (admEl) admEl.value = formData.temp[i].adm || "";
+                    if (closedEl) closedEl.checked = formData.temp[i].closed || false;
+                }
+            }
+            
+            // Load AHU Inputs
+            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
+            for (var j = 0; j < ahuHalls.length; j++) {
+                var i = ahuHalls[j];
+                if (formData.ahu && formData.ahu[i]) {
+                    var inEl = document.getElementById("ahu-in-" + i);
+                    var outEl = document.getElementById("ahu-out-" + i);
+                    var frEl = document.getElementById("ahu-fr-" + i);
+                    if (inEl) inEl.value = formData.ahu[i].in || "";
+                    if (outEl) outEl.value = formData.ahu[i].out || "";
+                    if (frEl) frEl.value = formData.ahu[i].fr || "";
+                }
+            }
+        }
+        
+        function clearFormInputs(type) {
+            var confirmClear = confirm("Are you sure you want to clear these inputs?");
+            if (confirmClear) {
+                var savedDataStr = localStorage.getItem('gscFormInputs');
+                var formData = savedDataStr ? JSON.parse(savedDataStr) : { temp: {}, ahu: {} };
+                
+                if (type === 'temp') {
+                    for (var idx = 0; idx < activeHalls.length; idx++) {
+                        var i = activeHalls[idx];
+                        document.getElementById("temp-h" + i).value = "";
+                        document.getElementById("adm-h" + i).value = "";
+                        document.getElementById("closed-h" + i).checked = false;
+                    }
+                    formData.temp = {};
+                } else if (type === 'ahu') {
+                    var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
+                    for (var j = 0; j < ahuHalls.length; j++) {
+                        var i = ahuHalls[j];
+                        document.getElementById("ahu-in-" + i).value = "";
+                        document.getElementById("ahu-out-" + i).value = "";
+                        document.getElementById("ahu-fr-" + i).value = "";
+                    }
+                    formData.ahu = {};
+                }
+                
+                localStorage.setItem('gscFormInputs', JSON.stringify(formData));
+            }
+        }
+
         // --- OVERLAY MODAL & VIBRATION LOGIC ---
         function showModalAlert(hall, title, message) {
             var modal = document.getElementById('alert-modal');
@@ -912,6 +1023,7 @@
             
             buildTempTable();
             buildAhuTable(); 
+            loadFormInputs(); 
             updateCalculatorView();
             
             switchTab('checklist');
@@ -981,7 +1093,7 @@
             updateCalculatorView();
         }
 
-        // --- NEW CHECKLIST LOGIC ---
+        // --- CHECKLIST LOGIC ---
         function renderChecklist() {
             var tbody = document.getElementById('checklist-body');
             tbody.innerHTML = '';
@@ -994,7 +1106,6 @@
 
                 for (var i = 0; i < sched.length; i = i + 1) {
                     var slot = sched[i];
-                    // Add ALL tasks to the array, checking if they are done
                     tasks.push({ hall: h, slotIdx: i, type: 1, name: "1st Check", time: slot.check1, isDone: slot.done1, title: slot.title });
                     tasks.push({ hall: h, slotIdx: i, type: 2, name: "2nd Check", time: slot.check2, isDone: slot.done2, title: slot.title });
                     tasks.push({ hall: h, slotIdx: i, type: 3, name: "3rd Check", time: slot.check3, isDone: slot.done3, title: slot.title });
@@ -1002,13 +1113,8 @@
                 }
             }
 
-            // SORT LOGIC: 
-            // 1. Put completed tasks at the very bottom
-            // 2. Sort pending tasks by time closest to NOW (most urgent at the top)
+            // SORT LOGIC: Strictly by chronological order, so the row positions never change
             tasks.sort(function(a, b) {
-                if (a.isDone !== b.isDone) {
-                    return a.isDone ? 1 : -1;
-                }
                 return getSecondsRemaining(a.time) - getSecondsRemaining(b.time);
             });
 
@@ -1025,7 +1131,6 @@
                 var tr = document.createElement('tr');
                 
                 if (t.isDone) {
-                    // COMPLETED STATE (Bold Grey, stays on list)
                     tr.className = "checklist-done";
                     tr.innerHTML = 
                         "<td>Hall " + t.hall + "</td>" +
@@ -1035,7 +1140,6 @@
                         "<td>DONE</td>" +
                         "<td><button class='action-btn' style='padding:8px 15px; font-size:0.9rem; background-color: #bdc3c7; color: white; cursor: default;' disabled>Completed</button></td>";
                 } else {
-                    // PENDING STATE
                     tr.innerHTML = 
                         "<td><strong>Hall " + t.hall + "</strong></td>" +
                         "<td>" + t.title + "</td>" +
@@ -1083,7 +1187,6 @@
 
                 var timeString = hrsStr + ":" + minsStr + ":" + secsStr;
                 
-                // Color coding for urgency
                 if (isNegative === true) {
                     timeString = "-" + timeString;
                     timers[t].style.color = "var(--danger)";
@@ -1111,9 +1214,9 @@
                 var rowHtml = 
                     "<tr>" +
                         "<td><strong>H" + i + "</strong></td>" +
-                        "<td><input type='text' id='temp-h" + i + "' placeholder='e.g. 21.9'></td>" +
-                        "<td><input type='number' id='adm-h" + i + "' placeholder='Qty'></td>" +
-                        "<td style='text-align:center;'><input type='checkbox' id='closed-h" + i + "' style='transform: scale(1.5);'></td>" +
+                        "<td><input type='text' id='temp-h" + i + "' placeholder='e.g. 21.9' oninput='saveFormInputs()'></td>" +
+                        "<td><input type='number' id='adm-h" + i + "' placeholder='Qty' oninput='saveFormInputs()'></td>" +
+                        "<td style='text-align:center;'><input type='checkbox' id='closed-h" + i + "' style='transform: scale(1.5);' onchange='saveFormInputs()'></td>" +
                     "</tr>";
                 table.innerHTML = table.innerHTML + rowHtml;
             }
@@ -1179,15 +1282,15 @@
             var headerRow = "<tr><th>AHU</th><th>In</th><th>Out</th><th>FR</th></tr>";
             table.innerHTML = headerRow;
 
-            var ahuHalls = [3, 5, 6, 8, 9, 11];
+            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
             for (var j = 0; j < ahuHalls.length; j = j + 1) {
                 var i = ahuHalls[j];
                 var rowHtml = 
                     "<tr>" +
                         "<td><strong>" + i + "</strong></td>" +
-                        "<td><input type='number' id='ahu-in-" + i + "' placeholder='In'></td>" +
-                        "<td><input type='number' id='ahu-out-" + i + "' placeholder='Out'></td>" +
-                        "<td><input type='text' id='ahu-fr-" + i + "' placeholder='FR'></td>" +
+                        "<td><input type='number' id='ahu-in-" + i + "' placeholder='In' oninput='saveFormInputs()'></td>" +
+                        "<td><input type='number' id='ahu-out-" + i + "' placeholder='Out' oninput='saveFormInputs()'></td>" +
+                        "<td><input type='text' id='ahu-fr-" + i + "' placeholder='FR' oninput='saveFormInputs()'></td>" +
                     "</tr>";
                 table.innerHTML = table.innerHTML + rowHtml;
             }
@@ -1216,7 +1319,7 @@
             reportText = reportText + "*Time -  " + timeStr + "*\n\n";
             reportText = reportText + "  Ahu Reading\n\n";
 
-            var ahuHalls = [3, 5, 6, 8, 9, 11];
+            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
             for (var j = 0; j < ahuHalls.length; j = j + 1) {
                 var i = ahuHalls[j];
                 var inVal = document.getElementById("ahu-in-" + i).value;
