@@ -294,6 +294,16 @@
             white-space: nowrap;
             transition: background-color 0.3s;
         }
+
+        /* Master Checklist Done Styling */
+        .checklist-done {
+            background-color: var(--done-bg);
+            transition: background-color 0.3s;
+        }
+        .checklist-done td {
+            color: #7f8c8d;
+            font-weight: bold;
+        }
         
         /* Input Table Styling (Temp & AHU) */
         .temp-input-table, .ahu-input-table {
@@ -521,6 +531,12 @@
         body.dark-mode .is-done .tick-btn {
             background-color: var(--success);
         }
+        body.dark-mode .checklist-done {
+            background-color: #1e3a2f; 
+        }
+        body.dark-mode .checklist-done td {
+            color: #7f8c8d; 
+        }
 
         /* MOBILE RESPONSIVE RULES */
         @media (max-width: 768px) {
@@ -636,7 +652,7 @@
 
             <div class="input-card">
                 <h2>Master Pending Tasks</h2>
-                <p style="font-size: 0.9rem; color: #7f8c8d;">Sorted by Hall (1-11). Click "Mark Done" to clear tasks.</p>
+                <p style="font-size: 0.9rem; color: #7f8c8d;">Sorted by time (most urgent at the top). Completed tasks are moved to the bottom in bold grey.</p>
                 <div class="table-responsive">
                     <table id="checklist-table">
                         <thead>
@@ -898,7 +914,6 @@
             buildAhuTable(); 
             updateCalculatorView();
             
-            // Default to Checklist Tab
             switchTab('checklist');
             
             startClock();
@@ -970,7 +985,7 @@
         function renderChecklist() {
             var tbody = document.getElementById('checklist-body');
             tbody.innerHTML = '';
-            var taskCount = 0;
+            var tasks = [];
 
             for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
                 var h = activeHalls[idx];
@@ -979,36 +994,58 @@
 
                 for (var i = 0; i < sched.length; i = i + 1) {
                     var slot = sched[i];
-                    var tasks = [];
-
-                    if (slot.done1 === false) { tasks.push({ type: 1, name: "1st Check", time: slot.check1 }); }
-                    if (slot.done2 === false) { tasks.push({ type: 2, name: "2nd Check", time: slot.check2 }); }
-                    if (slot.done3 === false) { tasks.push({ type: 3, name: "3rd Check", time: slot.check3 }); }
-                    if (slot.doneClean === false) { tasks.push({ type: 'Clean', name: "Clean & Open", time: slot.cleanTime }); }
-
-                    for (var j = 0; j < tasks.length; j = j + 1) {
-                        var t = tasks[j];
-                        taskCount = taskCount + 1;
-
-                        var arg = t.type;
-                        if (typeof arg === 'string') { arg = "'" + arg + "'"; }
-
-                        var tr = document.createElement('tr');
-                        tr.innerHTML = 
-                            "<td><strong>Hall " + h + "</strong></td>" +
-                            "<td>" + slot.title + "</td>" +
-                            "<td><strong>" + t.name + "</strong></td>" +
-                            "<td>" + t.time + "</td>" +
-                            "<td><span class='live-task-timer' data-time='" + t.time + "'>--:--:--</span></td>" +
-                            "<td><button class='action-btn' style='padding:8px 15px; font-size:0.9rem;' onclick=\"markDone(" + h + ", " + i + ", " + arg + ")\">Mark Done</button></td>";
-                        
-                        tbody.appendChild(tr);
-                    }
+                    // Add ALL tasks to the array, checking if they are done
+                    tasks.push({ hall: h, slotIdx: i, type: 1, name: "1st Check", time: slot.check1, isDone: slot.done1, title: slot.title });
+                    tasks.push({ hall: h, slotIdx: i, type: 2, name: "2nd Check", time: slot.check2, isDone: slot.done2, title: slot.title });
+                    tasks.push({ hall: h, slotIdx: i, type: 3, name: "3rd Check", time: slot.check3, isDone: slot.done3, title: slot.title });
+                    tasks.push({ hall: h, slotIdx: i, type: 'Clean', name: "Clean & Open", time: slot.cleanTime, isDone: slot.doneClean, title: slot.title });
                 }
             }
 
-            if (taskCount === 0) {
-                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:30px; color:#7f8c8d;'>No pending tasks! All clear.</td></tr>";
+            // SORT LOGIC: 
+            // 1. Put completed tasks at the very bottom
+            // 2. Sort pending tasks by time closest to NOW (most urgent at the top)
+            tasks.sort(function(a, b) {
+                if (a.isDone !== b.isDone) {
+                    return a.isDone ? 1 : -1;
+                }
+                return getSecondsRemaining(a.time) - getSecondsRemaining(b.time);
+            });
+
+            if (tasks.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:30px; color:#7f8c8d;'>No tasks generated yet. Load a schedule!</td></tr>";
+                return;
+            }
+
+            for (var j = 0; j < tasks.length; j = j + 1) {
+                var t = tasks[j];
+                var arg = t.type;
+                if (typeof arg === 'string') { arg = "'" + arg + "'"; }
+
+                var tr = document.createElement('tr');
+                
+                if (t.isDone) {
+                    // COMPLETED STATE (Bold Grey, stays on list)
+                    tr.className = "checklist-done";
+                    tr.innerHTML = 
+                        "<td>Hall " + t.hall + "</td>" +
+                        "<td>" + t.title + "</td>" +
+                        "<td>" + t.name + "</td>" +
+                        "<td>" + t.time + "</td>" +
+                        "<td>DONE</td>" +
+                        "<td><button class='action-btn' style='padding:8px 15px; font-size:0.9rem; background-color: #bdc3c7; color: white; cursor: default;' disabled>Completed</button></td>";
+                } else {
+                    // PENDING STATE
+                    tr.innerHTML = 
+                        "<td><strong>Hall " + t.hall + "</strong></td>" +
+                        "<td>" + t.title + "</td>" +
+                        "<td><strong>" + t.name + "</strong></td>" +
+                        "<td>" + t.time + "</td>" +
+                        "<td><span class='live-task-timer' data-time='" + t.time + "'>--:--:--</span></td>" +
+                        "<td><button class='action-btn' style='padding:8px 15px; font-size:0.9rem;' onclick=\"markDone(" + t.hall + ", " + t.slotIdx + ", " + arg + ")\">Mark Done</button></td>";
+                }
+                
+                tbody.appendChild(tr);
             }
 
             updateLiveChecklistTimers();
@@ -1045,6 +1082,8 @@
                 if (secsStr.length < 2) { secsStr = "0" + secsStr; }
 
                 var timeString = hrsStr + ":" + minsStr + ":" + secsStr;
+                
+                // Color coding for urgency
                 if (isNegative === true) {
                     timeString = "-" + timeString;
                     timers[t].style.color = "var(--danger)";
@@ -1489,7 +1528,6 @@
             banner.innerHTML = htmlText;
         }
 
-        // UPDATED: Now scans across ALL halls for the absolute next task
         function updateCountdownDisplay() {
             var nextTask = null;
             var minSeconds = 9999999;
