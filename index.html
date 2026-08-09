@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cinema Hall Check & Reminder System</title>
+    
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary: #2c3e50;
@@ -67,11 +72,11 @@
         /* Main Content */
         .main-content {
             flex-grow: 1;
-            display: block; /* FIXED: Changed from flex to block to stop mobile squishing */
+            display: block; 
             padding: 20px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            min-height: 0; /* Ensures proper scrolling */
+            min-height: 0; 
         }
         .header-panel {
             display: flex;
@@ -117,8 +122,8 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
-            flex-shrink: 0; /* Force lock height */
-            min-height: 55px; /* Force lock height */
+            flex-shrink: 0; 
+            min-height: 55px; 
         }
         .tab-container::-webkit-scrollbar {
             display: none;
@@ -135,8 +140,8 @@
             transition: 0.2s;
             white-space: nowrap;
             -webkit-tap-highlight-color: transparent;
-            flex-shrink: 0; /* Stops text cut-off */
-            height: 45px; /* Locked button height */
+            flex-shrink: 0; 
+            height: 45px; 
             box-sizing: border-box;
         }
         .tab-btn:hover {
@@ -561,7 +566,7 @@
                 scrollbar-width: none;
                 border-bottom: 2px solid var(--secondary);
                 border-right: none !important;
-                flex-shrink: 0; /* Stop sidebar from hiding */
+                flex-shrink: 0; 
             }
             .sidebar::-webkit-scrollbar { display: none; }
             .sidebar-header { display: none; }
@@ -620,7 +625,7 @@
         </div>
     </div>
 
-    <!-- Sidebar for 10 Halls -->
+    <!-- Sidebar for 11 Halls -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">GSC Hall Selector</div>
         <!-- Buttons injected via JS -->
@@ -769,7 +774,7 @@
                     </div>
                     <br>
                     <button class="action-btn" onclick="generateTempReport()">Generate Report & Copy</button>
-                    <!-- NEW CLEAR BUTTON -->
+                    <!-- CLEAR BUTTON -->
                     <button class="action-btn danger-btn" onclick="clearFormInputs('temp')" style="margin-top:10px;">Clear Temp Fields</button>
                 </div>
 
@@ -795,7 +800,7 @@
                     </div>
                     <br>
                     <button class="action-btn" onclick="generateAhuReport()">Generate AHU Report & Copy</button>
-                    <!-- NEW CLEAR BUTTON -->
+                    <!-- CLEAR BUTTON -->
                     <button class="action-btn danger-btn" onclick="clearFormInputs('ahu')" style="margin-top:10px;">Clear AHU Fields</button>
                 </div>
 
@@ -814,6 +819,21 @@
     <div class="reminder-panel" id="reminder-panel"></div>
 
     <script>
+        // ================= FIREBASE CONFIGURATION =================
+        const firebaseConfig = {
+          apiKey: "AIzaSyBmYC41aGgizbJ46LsGMkuLKlcIaOs3_90",
+          authDomain: "gsc-hall-manager.firebaseapp.com",
+          databaseURL: "https://gsc-hall-manager-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "gsc-hall-manager",
+          storageBucket: "gsc-hall-manager.firebasestorage.app",
+          messagingSenderId: "183012011376",
+          appId: "1:183012011376:web:855d4f085e44434ce8b3b5",
+          measurementId: "G-6V7MG0QNYZ"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        // ==========================================================
+
         // System Data
         var activeHalls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; 
         var activeHall = 1;
@@ -853,34 +873,46 @@
             }
         }
 
-        // --- LOCAL STORAGE LOGIC ---
-        function saveToStorage() {
-            localStorage.setItem('gscCinemaData', JSON.stringify(hallData));
-        }
-
+        // --- FIREBASE LIVE CLOUD SYNCING ---
         function loadFromStorage() {
-            var savedData = localStorage.getItem('gscCinemaData');
-            if (savedData) {
-                hallData = JSON.parse(savedData);
-            }
-        }
-
-        function clearAllData() {
-            var confirmDelete = confirm("Are you sure you want to delete ALL schedules for ALL halls? This cannot be undone.");
-            if (confirmDelete === true) {
-                for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
-                    hallData[activeHalls[idx]] = [];
+            db.ref('cinemaHalls').on('value', function(snapshot) {
+                var data = snapshot.val();
+                if (data) {
+                    hallData = data;
+                } else {
+                    for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                        hallData[activeHalls[idx]] = [];
+                    }
                 }
-                saveToStorage();
                 renderTable();
                 renderChecklist();
                 updateCountdownDisplay();
                 updateGlobalNextMovie();
-                alert("All hall data has been cleared.");
+            });
+        }
+
+        function saveToStorage() {
+            db.ref('cinemaHalls').set(hallData);
+        }
+
+        function clearAllData() {
+            var pass = prompt("WARNING: This will delete ALL schedules for ALL 11 halls.\n\nEnter Admin Password to continue:");
+            
+            if (pass === "Ammar123") {
+                var confirmDelete = confirm("Password accepted. Are you ABSOLUTELY sure you want to delete everything? This syncs to all devices instantly.");
+                if (confirmDelete === true) {
+                    for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
+                        hallData[activeHalls[idx]] = [];
+                    }
+                    saveToStorage();
+                    alert("All hall data has been successfully cleared.");
+                }
+            } else if (pass !== null) {
+                alert("Incorrect Password. Action cancelled.");
             }
         }
 
-        // --- FORM AUTO-SAVE LOGIC ---
+        // --- FORM LOCAL AUTO-SAVE LOGIC ---
         function saveFormInputs() {
             var formData = { temp: {}, ahu: {} };
             
@@ -1277,7 +1309,7 @@
             alert("Temp Report generated and copied to clipboard!");
         }
 
-        // --- AHU REPORT LOGIC (HARDCODED HALLS) ---
+        // --- AHU REPORT LOGIC ---
         function buildAhuTable() {
             var table = document.getElementById("ahu-table-inputs");
             var headerRow = "<tr><th>AHU</th><th>In</th><th>Out</th><th>FR</th></tr>";
@@ -1455,10 +1487,6 @@
             saveToStorage(); 
             
             document.getElementById('schedule-input').value = ''; 
-            renderTable();
-            renderChecklist();
-            updateCountdownDisplay();
-            updateGlobalNextMovie();
         }
 
         function markDone(hallNum, slotIndex, checkNum) {
@@ -1468,14 +1496,6 @@
             else if (checkNum === 3) { hallData[hallNum][slotIndex].done3 = true; }
             
             saveToStorage(); 
-            
-            if (activeHall === hallNum) {
-                renderTable();
-            }
-            if (document.getElementById('view-checklist').style.display === 'block') {
-                renderChecklist();
-            }
-            updateCountdownDisplay();
         }
 
         function buildCheckCell(checkTime, isDone, checkNum, slotIndex) {
@@ -1574,9 +1594,6 @@
             var target = new Date();
             target.setHours(hours, minutes, 0, 0);
 
-            // NEW CINEMA DAY LOGIC:
-            // If the movie is early morning (12am - 6am) but it's currently daytime (6am - 11pm),
-            // it means the movie is actually tomorrow morning!
             if (hours < 6 && now.getHours() >= 6) {
                 target.setDate(target.getDate() + 1);
             }
