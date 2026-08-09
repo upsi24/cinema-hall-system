@@ -89,6 +89,32 @@
             font-size: 1.5rem;
             color: var(--primary);
         }
+        .top-right-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* NEW SYNC BADGE STYLING */
+        #sync-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            background: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #sync-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--danger);
+        }
+
         .clock {
             font-size: 1.5rem;
             font-weight: bold;
@@ -552,6 +578,11 @@
             color: #7f8c8d; 
             text-decoration: line-through;
         }
+        body.dark-mode #sync-status {
+            background-color: #333;
+            color: #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
 
         /* MOBILE RESPONSIVE RULES */
         @media (max-width: 768px) {
@@ -586,6 +617,10 @@
                 align-items: flex-start;
                 gap: 10px;
             }
+            .top-right-controls {
+                width: 100%;
+                justify-content: flex-end;
+            }
             .clock { text-align: left; }
             
             .countdown-banner {
@@ -602,14 +637,6 @@
                 right: 5%;
                 left: 5%;
                 width: 90%;
-            }
-            .top-right-controls {
-                display: flex;
-                flex-direction: row-reverse;
-                justify-content: flex-end;
-                width: 100%;
-                align-items: center;
-                gap: 15px;
             }
         }
     </style>
@@ -636,6 +663,12 @@
         <div class="header-panel">
             <h1 id="current-hall-title">Hall Management</h1>
             <div class="top-right-controls">
+                <!-- CLOUD SYNC INDICATOR BADGE -->
+                <div id="sync-status">
+                    <div id="sync-dot" style="animation: pulse 1s infinite;"></div>
+                    <span id="sync-text" style="font-weight: bold;">Connecting...</span>
+                </div>
+
                 <div class="clock" id="live-clock">
                     <div class="clock-12h">--:--:-- --</div>
                     <div class="clock-24h">--:--:--</div>
@@ -873,26 +906,91 @@
             }
         }
 
-        // --- FIREBASE LIVE CLOUD SYNCING ---
+        // --- CONNECTION INDICATOR ---
+        db.ref('.info/connected').on('value', function(snap) {
+            var dot = document.getElementById('sync-dot');
+            var txt = document.getElementById('sync-text');
+            if (snap.val() === true) {
+                dot.style.backgroundColor = 'var(--success)';
+                dot.style.animation = 'none';
+                txt.innerText = 'Cloud Synced';
+                
+                // Force seed cloud if Firebase erased empty arrays
+                db.ref('systemData/schedules').once('value').then(function(snapshot) {
+                    if (!snapshot.val()) {
+                        var localSched = localStorage.getItem('gscCinemaData');
+                        if(localSched) db.ref('systemData/schedules').set(JSON.parse(localSched));
+                    }
+                });
+            } else {
+                dot.style.backgroundColor = 'var(--danger)';
+                dot.style.animation = 'pulse 1s infinite';
+                txt.innerText = 'Offline';
+            }
+        });
+
+        // --- FIREBASE HYBRID SYNC ENGINE ---
         function loadFromStorage() {
-            db.ref('cinemaHalls').on('value', function(snapshot) {
+            // 1. Load Local Schedule Instantly
+            var localSched = localStorage.getItem('gscCinemaData');
+            if (localSched) {
+                try { 
+                    var parsed = JSON.parse(localSched);
+                    for (var idx = 0; idx < activeHalls.length; idx++) {
+                        var h = activeHalls[idx];
+                        hallData[h] = parsed[h] || [];
+                    }
+                } catch(e){}
+            }
+
+            // 2. Load Local Forms Instantly
+            var localForms = localStorage.getItem('gscFormInputs');
+            if (localForms) {
+                try { applyFormInputsToUI(JSON.parse(localForms)); } catch(e){}
+            }
+            
+            renderTable();
+            renderChecklist();
+            updateCountdownDisplay();
+            updateGlobalNextMovie();
+
+            // 3. Connect to Firebase Cloud - Schedules
+            db.ref('systemData/schedules').on('value', function(snapshot) {
                 var data = snapshot.val();
                 if (data) {
-                    hallData = data;
-                } else {
-                    for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
-                        hallData[activeHalls[idx]] = [];
+                    for (var idx = 0; idx < activeHalls.length; idx++) {
+                        var h = activeHalls[idx];
+                        // Protect against Firebase deleting empty arrays
+                        hallData[h] = data[h] || [];
                     }
+                    localStorage.setItem('gscCinemaData', JSON.stringify(hallData));
+                    renderTable();
+                    renderChecklist();
+                    updateCountdownDisplay();
+                    updateGlobalNextMovie();
                 }
-                renderTable();
-                renderChecklist();
-                updateCountdownDisplay();
-                updateGlobalNextMovie();
+            });
+
+            // 4. Connect to Firebase Cloud - Forms
+            db.ref('systemData/forms').on('value', function(snapshot) {
+                var data = snapshot.val();
+                if (data) {
+                    localStorage.setItem('gscFormInputs', JSON.stringify(data));
+                    applyFormInputsToUI(data);
+                }
             });
         }
 
         function saveToStorage() {
-            db.ref('cinemaHalls').set(hallData);
+            // Update local memory immediately
+            localStorage.setItem('gscCinemaData', JSON.stringify(hallData));
+            renderTable();
+            renderChecklist();
+            updateCountdownDisplay();
+            updateGlobalNextMovie();
+
+            // Sync to Firebase Cloud
+            db.ref('systemData/schedules').set(hallData);
         }
 
         function clearAllData() {
@@ -913,6 +1011,36 @@
         }
 
         // --- FORM LOCAL AUTO-SAVE LOGIC ---
+        function applyFormInputsToUI(formData) {
+            // Safe assignment so cursor doesn't jump while actively typing
+            for (var idx = 0; idx < activeHalls.length; idx++) {
+                var i = activeHalls[idx];
+                if (formData.temp && formData.temp[i]) {
+                    var tempEl = document.getElementById("temp-h" + i);
+                    var admEl = document.getElementById("adm-h" + i);
+                    var closedEl = document.getElementById("closed-h" + i);
+                    
+                    if (tempEl && document.activeElement !== tempEl) tempEl.value = formData.temp[i].temp || "";
+                    if (admEl && document.activeElement !== admEl) admEl.value = formData.temp[i].adm || "";
+                    if (closedEl && document.activeElement !== closedEl) closedEl.checked = formData.temp[i].closed || false;
+                }
+            }
+            
+            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
+            for (var j = 0; j < ahuHalls.length; j++) {
+                var i = ahuHalls[j];
+                if (formData.ahu && formData.ahu[i]) {
+                    var inEl = document.getElementById("ahu-in-" + i);
+                    var outEl = document.getElementById("ahu-out-" + i);
+                    var frEl = document.getElementById("ahu-fr-" + i);
+                    
+                    if (inEl && document.activeElement !== inEl) inEl.value = formData.ahu[i].in || "";
+                    if (outEl && document.activeElement !== outEl) outEl.value = formData.ahu[i].out || "";
+                    if (frEl && document.activeElement !== frEl) frEl.value = formData.ahu[i].fr || "";
+                }
+            }
+        }
+
         function saveFormInputs() {
             var formData = { temp: {}, ahu: {} };
             
@@ -948,41 +1076,11 @@
             }
             
             localStorage.setItem('gscFormInputs', JSON.stringify(formData));
-        }
-
-        function loadFormInputs() {
-            var savedData = localStorage.getItem('gscFormInputs');
-            if (!savedData) return;
-            var formData = JSON.parse(savedData);
-            
-            for (var idx = 0; idx < activeHalls.length; idx++) {
-                var i = activeHalls[idx];
-                if (formData.temp && formData.temp[i]) {
-                    var tempEl = document.getElementById("temp-h" + i);
-                    var admEl = document.getElementById("adm-h" + i);
-                    var closedEl = document.getElementById("closed-h" + i);
-                    if (tempEl) tempEl.value = formData.temp[i].temp || "";
-                    if (admEl) admEl.value = formData.temp[i].adm || "";
-                    if (closedEl) closedEl.checked = formData.temp[i].closed || false;
-                }
-            }
-            
-            var ahuHalls = [3, 5, 6, 8, 9, 10, 11];
-            for (var j = 0; j < ahuHalls.length; j++) {
-                var i = ahuHalls[j];
-                if (formData.ahu && formData.ahu[i]) {
-                    var inEl = document.getElementById("ahu-in-" + i);
-                    var outEl = document.getElementById("ahu-out-" + i);
-                    var frEl = document.getElementById("ahu-fr-" + i);
-                    if (inEl) inEl.value = formData.ahu[i].in || "";
-                    if (outEl) outEl.value = formData.ahu[i].out || "";
-                    if (frEl) frEl.value = formData.ahu[i].fr || "";
-                }
-            }
+            db.ref('systemData/forms').set(formData);
         }
         
         function clearFormInputs(type) {
-            var confirmClear = confirm("Are you sure you want to clear these inputs?");
+            var confirmClear = confirm("Are you sure you want to clear these inputs? This syncs to all devices.");
             if (confirmClear) {
                 var savedDataStr = localStorage.getItem('gscFormInputs');
                 var formData = savedDataStr ? JSON.parse(savedDataStr) : { temp: {}, ahu: {} };
@@ -1007,6 +1105,7 @@
                 }
                 
                 localStorage.setItem('gscFormInputs', JSON.stringify(formData));
+                db.ref('systemData/forms').set(formData);
             }
         }
 
@@ -1039,8 +1138,7 @@
         // Setup UI
         function init() {
             loadTheme();
-            loadFromStorage();
-
+            
             var sidebar = document.getElementById('sidebar');
             for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
                 var i = activeHalls[idx];
@@ -1057,13 +1155,12 @@
             
             buildTempTable();
             buildAhuTable(); 
-            loadFormInputs(); 
+            loadFromStorage();
             updateCalculatorView();
             
             switchTab('checklist');
             
             startClock();
-            renderTable();
         }
 
         function createClickHandler(hallNum, btnElem) {
@@ -1530,7 +1627,7 @@
             tbody.innerHTML = '';
             var currentSchedule = hallData[activeHall];
             
-            if (currentSchedule.length === 0) {
+            if (!currentSchedule || currentSchedule.length === 0) {
                 tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:#7f8c8d; padding:30px;'>No schedule loaded for this hall yet. Paste data above.</td></tr>";
                 return;
             }
@@ -1604,6 +1701,7 @@
         }
         
         function hasAlert(array, val) {
+            if (!array) return false;
             for (var i = 0; i < array.length; i = i + 1) {
                 if (array[i] === val) { return true; }
             }
@@ -1750,9 +1848,11 @@
             for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
                 var hall = activeHalls[idx];
                 var currentSchedule = hallData[hall];
+                if (!currentSchedule) continue;
                 
                 for (var i = 0; i < currentSchedule.length; i = i + 1) {
                     var slot = currentSchedule[i];
+                    if (!slot.alerted) slot.alerted = [];
                     
                     if (slot.openTime === currentTime && hasAlert(slot.alerted, 'open') === false) {
                         showModalAlert(hall, slot.title, "SEATING OPENING (15 Mins to Start)!");
