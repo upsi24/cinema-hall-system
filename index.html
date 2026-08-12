@@ -1708,6 +1708,7 @@
             return false;
         }
 
+        // THE UPDATED GLOBAL BANNER LOGIC FOR ADS
         function updateGlobalNextMovie() {
             var upcoming = [];
 
@@ -1717,7 +1718,8 @@
                 if (sched) {
                     for (var i = 0; i < sched.length; i = i + 1) {
                         var sec = getSecondsRemaining(sched[i].start);
-                        if (sec > 0 && sec <= 900) {
+                        // Check if between 15 mins before start (900s) AND 15 mins after start (-900s) for ads
+                        if (sec > -900 && sec <= 900) {
                             var item = { hall: h, time: sched[i].start, seconds: sec };
                             upcoming.push(item);
                         }
@@ -1732,19 +1734,28 @@
             var banner = document.getElementById('global-next-banner');
             
             if (upcoming.length === 0) {
-                banner.innerHTML = "<div style='opacity: 0.9;'>No halls currently in the 15-minute seating window.</div>";
+                banner.innerHTML = "<div style='opacity: 0.9;'>No halls currently in the 15-minute seating or ad window.</div>";
                 return;
             }
 
-            var htmlText = "<div style='margin-bottom: 5px;'><strong>🟢 Currently Open for Seating:</strong></div>";
+            var htmlText = "<div style='margin-bottom: 5px;'><strong>🟢 Currently Open for Seating & Ads:</strong></div>";
             
             for (var j = 0; j < upcoming.length; j = j + 1) {
                 var item = upcoming[j];
-                var mins = Math.floor(item.seconds / 60);
+                var statusText = "";
+                var icon = "👉";
                 
-                var statusText = "<span style='color:#ffeb3b; font-weight:bold;'> (Starts in " + mins + " min)</span>";
+                if (item.seconds > 0) {
+                    var mins = Math.floor(item.seconds / 60);
+                    statusText = "<span style='color:#ffeb3b; font-weight:bold;'> (Starts in " + mins + " min)</span>";
+                    icon = "👉";
+                } else {
+                    var adMinsLeft = Math.ceil((900 + item.seconds) / 60);
+                    statusText = "<span style='color:#ff9800; font-weight:bold;'> (Ads Playing - " + adMinsLeft + " min left)</span>";
+                    icon = "🐒";
+                }
                 
-                htmlText = htmlText + "<div style='margin-top: 5px; font-size: 0.95rem;'>👉 <strong>Hall " + item.hall + "</strong> at " + item.time + statusText + "</div>";
+                htmlText = htmlText + "<div style='margin-top: 5px; font-size: 0.95rem;'>" + icon + " <strong>Hall " + item.hall + "</strong> at " + item.time + statusText + "</div>";
             }
 
             banner.innerHTML = htmlText;
