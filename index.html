@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- IPHONE DESKTOP SITE FIX -->
+    <script>
+        if (navigator.userAgent.match(/Macintosh/) && navigator.maxTouchPoints > 0 && window.screen.width <= 768) {
+            document.querySelector("meta[name=viewport]").setAttribute("content", "width=1024");
+        }
+    </script>
+
     <title>Cinema Hall Check & Reminder System</title>
     
     <!-- FIREBASE SDKS -->
@@ -20,13 +28,6 @@
             --light: #ecf0f1;
             --done-bg: #d5f5e3;
         }
-
-        /* --- IPHONE DESKTOP SITE FIX --- */
-        html {
-            height: -webkit-fill-available;
-        }
-        /* ------------------------------- */
-
         body {
             font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
@@ -34,12 +35,6 @@
             background-color: #f5f6fa;
             display: flex;
             height: 100vh;
-            
-            /* --- IPHONE DESKTOP SITE FIXES --- */
-            height: -webkit-fill-available;
-            -webkit-text-size-adjust: 100%;
-            /* --------------------------------- */
-            
             overflow: hidden;
             flex-direction: row; 
             transition: background-color 0.3s, color 0.3s;
