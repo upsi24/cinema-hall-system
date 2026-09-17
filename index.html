@@ -108,16 +108,19 @@
             flex-grow: 1;
             display: block; 
             padding: 20px;
-            overflow-y: auto;
+            overflow-y: hidden; /* Prevent full page scroll */
             -webkit-overflow-scrolling: touch;
             min-height: 0; 
-            perspective: 1200px; /* Prepares 3D space */
+            perspective: 1200px; 
+            display: flex;
+            flex-direction: column;
         }
         .header-panel {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            flex-shrink: 0;
         }
         .header-panel h1 {
             margin: 0;
@@ -199,6 +202,7 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: background-color 0.4s ease, border 0.4s ease;
+            flex-shrink: 0;
         }
 
         /* Tab Navigation - STANDARD */
@@ -255,6 +259,7 @@
             align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.15);
             transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
+            flex-shrink: 0;
         }
         .countdown-text {
             font-size: 1.1rem;
@@ -288,7 +293,35 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             transition: background-color 0.4s ease, border 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
         }
+        
+        /* CHECKLIST INTERNAL SCROLL CONTAINER */
+        #view-checklist {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for Firefox flex scrolling */
+        }
+        #view-checklist .input-card {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        #checklist-scroll-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            border-radius: 8px;
+            position: relative;
+            padding-bottom: 20px;
+            /* Smooth custom scrolling */
+            scroll-behavior: smooth;
+        }
+
         .input-card h3, .input-card h2 {
             margin-top: 0;
             color: var(--primary);
@@ -391,13 +424,18 @@
             text-align: left;
             border-bottom: 1px solid #eee;
             vertical-align: middle;
-            transition: border-color 0.4s ease, background-color 0.3s ease, transform 0.3s ease;
+            transition: border-color 0.4s ease, background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
+        
+        /* STICKY HEADERS */
         th {
             background-color: var(--secondary);
             color: white;
             white-space: nowrap;
             transition: background-color 0.4s ease;
+            position: sticky;
+            top: 0;
+            z-index: 5;
         }
 
         /* Master Checklist Done Styling */
@@ -592,7 +630,6 @@
         body.dark-theme .checklist-done { background-color: #1e3a2f; }
         body.dark-theme .checklist-done td { color: #7f8c8d; text-decoration: line-through; }
         body.dark-theme #sync-status { background-color: #333; color: #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        /* Custom Dropdown Override - Dark */
         body.dark-theme #theme-selector {
             background-color: #2c2c2c; color: #e0e0e0; border: 2px solid #444;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0e0e0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -637,7 +674,6 @@
         body.gsc-theme .countdown-banner { background: #111; border: 1px solid #333; color: var(--gsc-gold); }
         body.gsc-theme .hall-btn { color: #888; border-bottom: 1px solid #222; }
         body.gsc-theme .hall-btn:hover, body.gsc-theme .hall-btn.active { background-color: transparent; color: var(--gsc-gold); border-left: 4px solid var(--gsc-gold); }
-        /* Custom Dropdown Override - GSC */
         body.gsc-theme #theme-selector {
             background-color: #000; color: var(--gsc-gold); border: 2px solid #333; border-radius: 20px; box-shadow: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffcc00' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -647,7 +683,6 @@
 
         /* ================= 2026 ERA SUPER ANIMATED 3D THEMES (EXPERIMENTAL) ================= */
         
-        /* High-End Background Animation Keyframes */
         @keyframes liquidFlow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -664,13 +699,34 @@
             100% { box-shadow: 0 0 10px var(--accent), inset 0 0 10px var(--accent); }
         }
 
+        /* Shared Custom Scrollbars for Experimental Themes */
+        body.vortex-theme #checklist-scroll-container::-webkit-scrollbar,
+        body.payments-theme #checklist-scroll-container::-webkit-scrollbar,
+        body.hoodie-theme #checklist-scroll-container::-webkit-scrollbar,
+        body.fashion-theme #checklist-scroll-container::-webkit-scrollbar,
+        body.nature-theme #checklist-scroll-container::-webkit-scrollbar { width: 8px; }
+
+        body.vortex-theme #checklist-scroll-container::-webkit-scrollbar-track,
+        body.payments-theme #checklist-scroll-container::-webkit-scrollbar-track,
+        body.hoodie-theme #checklist-scroll-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 8px; }
+        
+        body.fashion-theme #checklist-scroll-container::-webkit-scrollbar-track,
+        body.nature-theme #checklist-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); border-radius: 8px; }
+
+        body.vortex-theme #checklist-scroll-container::-webkit-scrollbar-thumb,
+        body.payments-theme #checklist-scroll-container::-webkit-scrollbar-thumb,
+        body.hoodie-theme #checklist-scroll-container::-webkit-scrollbar-thumb,
+        body.fashion-theme #checklist-scroll-container::-webkit-scrollbar-thumb,
+        body.nature-theme #checklist-scroll-container::-webkit-scrollbar-thumb { 
+            background: var(--accent); border-radius: 8px; box-shadow: 0 0 10px var(--accent); 
+        }
+
         /* Shared Glassmorphism & 3D Base */
         body.vortex-theme, body.payments-theme, body.fashion-theme, body.nature-theme, body.hoodie-theme {
             background-size: 200% 200%;
             animation: liquidFlow 12s ease infinite;
         }
 
-        /* Shared Sidebar */
         body.vortex-theme .sidebar, body.payments-theme .sidebar, body.hoodie-theme .sidebar,
         body.fashion-theme .sidebar, body.nature-theme .sidebar { 
             background-color: rgba(20, 20, 25, 0.6); 
@@ -721,13 +777,16 @@
             box-shadow: -5px 5px 15px rgba(0,0,0,0.2);
         }
 
+        /* Glassmorphism Sticky Headers */
         body.vortex-theme th, body.payments-theme th, body.hoodie-theme th,
         body.fashion-theme th, body.nature-theme th { 
-            background-color: rgba(0,0,0,0.2); 
+            background-color: rgba(20, 22, 28, 0.85); 
+            backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(255,255,255,0.1); 
             text-transform: uppercase; 
             font-size: 0.85rem; 
             letter-spacing: 1px; 
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
         }
         body.vortex-theme td, body.payments-theme td, body.hoodie-theme td,
         body.fashion-theme td, body.nature-theme td { border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -793,7 +852,7 @@
             box-shadow: 0 0 15px rgba(255,255,255,0.1);
         }
 
-        /* --- THEME SELECTOR BUTTON (EXPERIMENTAL BASE) --- */
+        /* THEME SELECTOR BUTTON (EXPERIMENTAL BASE) */
         body.vortex-theme #theme-selector, body.payments-theme #theme-selector, body.hoodie-theme #theme-selector,
         body.fashion-theme #theme-selector, body.nature-theme #theme-selector {
             background-color: rgba(0,0,0,0.4);
@@ -815,7 +874,6 @@
         body.nature-theme .header-panel h1, body.nature-theme .clock, body.nature-theme .input-card h2, body.nature-theme .input-card h3, body.nature-theme strong, body.nature-theme .sidebar-header { 
             color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
         }
-        
         
         /* === SPECIFIC COLOR & BG OVERRIDES FOR THE 5 THEMES === */
 
@@ -876,6 +934,7 @@
             background: linear-gradient(135deg, #380715 0%, #6e102b 50%, #000000 100%);
             color: #ffe4e6;
         }
+        body.fashion-theme th { background-color: rgba(136, 19, 55, 0.85); color: #fff; }
         body.fashion-theme .sidebar { background-color: rgba(136, 19, 55, 0.5); }
         body.fashion-theme .tab-btn.active { background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; }
         body.fashion-theme .hall-btn.active { color: #f43f5e; background: rgba(244, 63, 94, 0.1); border-left: 4px solid #f43f5e; border-bottom: none; text-shadow: 0 0 10px rgba(244, 63, 94, 0.5); }
@@ -894,6 +953,7 @@
             background: linear-gradient(135deg, #091a0f 0%, #173f22 50%, #000000 100%);
             color: #ecfccb;
         }
+        body.nature-theme th { background-color: rgba(23, 63, 34, 0.85); color: #fff; }
         body.nature-theme .sidebar { background-color: rgba(20, 83, 45, 0.5); }
         body.nature-theme .tab-btn.active { background-color: #84cc16; color: #000; }
         body.nature-theme .hall-btn.active { color: #84cc16; background: rgba(132, 204, 22, 0.1); border-left: 4px solid #84cc16; border-bottom: none; text-shadow: 0 0 10px rgba(132, 204, 22, 0.5); }
@@ -1049,12 +1109,13 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
                     <div>
                         <h2>Master Pending Tasks</h2>
-                        <p style="font-size: 0.9rem; color: #7f8c8d; margin: 0;">Expired tasks (1hr+) are auto-marked. Checklist auto-scrolls to the next pending task.</p>
+                        <p style="font-size: 0.9rem; color: #7f8c8d; margin: 0;">Expired tasks (1hr+) are auto-marked. Checklist auto-scrolls internally.</p>
                     </div>
                     <button class="action-btn" onclick="scrollToCurrentTask()" style="width: auto; padding: 6px 12px; font-size: 0.85rem; border-radius: 20px;">🎯 Find Next Task</button>
                 </div>
                 
-                <div class="table-responsive" id="checklist-scroll-container">
+                <!-- INTERNAL ISOLATED SCROLL CONTAINER FOR THE CHECKLIST -->
+                <div class="table-responsive" id="checklist-scroll-container" style="max-height: calc(100vh - 380px);">
                     <table id="checklist-table">
                         <thead>
                             <tr>
@@ -1279,6 +1340,7 @@
         // --- CONNECTION INDICATOR ---
         db.ref('.info/connected').on('value', function(snap) {
             var dot = document.getElementById('sync-dot');
+            var txt = document.getElementById('sync-text');
             if (snap.val() === true) {
                 dot.style.backgroundColor = 'var(--success)';
                 dot.style.animation = 'none';
@@ -1553,7 +1615,7 @@
             var viewId = 'view-' + tab;
 
             if (tab === 'checklist') {
-                document.getElementById(viewId).style.display = 'block';
+                document.getElementById(viewId).style.display = 'flex';
                 document.getElementById('tab-checklist-btn').classList.add('active');
                 shouldAutoScrollChecklist = true;
                 renderChecklist();
@@ -1596,27 +1658,50 @@
             updateCalculatorView();
             
             // Re-animate the current view on hall change too!
-            var currentViewMatch = document.querySelector('.main-content > div.animated-view[style*="display: block"]');
-            if(currentViewMatch) resetAnimation(currentViewMatch.id);
+            var currentViewMatch = document.querySelector('.main-content > div.animated-view');
+            if(currentViewMatch && currentViewMatch.style.display !== 'none') resetAnimation(currentViewMatch.id);
         }
 
-        // --- NEW: AUTO-SCROLL TO CURRENT TASK LOGIC ---
+        // --- NEW: AUTO-SCROLL TO CURRENT TASK LOGIC (ISOLATED) ---
         function scrollToCurrentTask() {
             var tbody = document.getElementById('checklist-body');
-            if (!tbody) return;
+            var container = document.getElementById('checklist-scroll-container');
+            if (!tbody || !container) return;
             var rows = tbody.getElementsByTagName('tr');
             
             for (var i = 0; i < rows.length; i++) {
                 if (!rows[i].classList.contains('checklist-done')) {
-                    // Smoothly scroll the closest pending item to the middle of the screen
-                    rows[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
                     
-                    // Add a tiny flash effect to help locate it
+                    // Calculate internal scroll position
+                    var rowTop = rows[i].offsetTop;
+                    var rowHeight = rows[i].clientHeight;
+                    var containerHeight = container.clientHeight;
+                    
+                    // Center the row exactly in the middle of the scrollable box
+                    var scrollTo = rowTop - (containerHeight / 2) + (rowHeight / 2);
+                    
+                    container.scrollTo({
+                        top: scrollTo,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Add a smart flash effect to help locate it
                     var originalBg = rows[i].style.backgroundColor;
-                    rows[i].style.backgroundColor = "rgba(52, 152, 219, 0.3)";
-                    setTimeout(function(r, bg) { 
+                    var originalBoxShadow = rows[i].style.boxShadow;
+                    
+                    var isExperimental = document.body.className.match(/(vortex|payments|hoodie|fashion|nature)-theme/);
+                    
+                    if (isExperimental) {
+                        rows[i].style.boxShadow = "inset 0 0 25px var(--accent)";
+                        rows[i].style.backgroundColor = "rgba(255,255,255,0.1)";
+                    } else {
+                        rows[i].style.backgroundColor = "rgba(52, 152, 219, 0.3)";
+                    }
+                    
+                    setTimeout(function(r, bg, shadow) { 
                         r.style.backgroundColor = bg; 
-                    }, 800, rows[i], originalBg);
+                        r.style.boxShadow = shadow;
+                    }, 1200, rows[i], originalBg, originalBoxShadow);
                     
                     break;
                 }
@@ -1685,7 +1770,7 @@
             
             // Execute Auto-Scroll if flagged (like changing tabs or clicking mark done)
             if (shouldAutoScrollChecklist) {
-                setTimeout(scrollToCurrentTask, 200); // 200ms delay to let the DOM render smoothly first
+                setTimeout(scrollToCurrentTask, 250); // 250ms delay to let DOM & animation render smoothly first
                 shouldAutoScrollChecklist = false;
             }
         }
@@ -2133,7 +2218,7 @@
                 updateGlobalNextMovie(); 
                 
                 // 5. Update checklist countdown strings
-                if (document.getElementById('view-checklist').style.display === 'block') {
+                if (document.getElementById('view-checklist').style.display === 'flex' || document.getElementById('view-checklist').style.display === 'block') {
                     updateLiveChecklistTimers();
                 }
             }, 1000); 
