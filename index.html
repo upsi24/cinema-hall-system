@@ -27,6 +27,7 @@
             --success: #2ecc71;
             --light: #ecf0f1;
             --done-bg: #d5f5e3;
+            --gsc-gold: #e5a900; /* Official GSC Yellow/Gold */
         }
 
         /* --- IPHONE DESKTOP SITE FIX --- */
@@ -70,7 +71,7 @@
             text-align: center;
             font-weight: bold;
             font-size: 1.2rem;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, color 0.3s;
         }
         .hall-btn {
             padding: 16px 20px;
@@ -109,6 +110,7 @@
             margin: 0;
             font-size: 1.5rem;
             color: var(--primary);
+            transition: color 0.3s;
         }
         .top-right-controls {
             display: flex;
@@ -142,6 +144,7 @@
             color: var(--primary);
             text-align: right;
             line-height: 1.2;
+            transition: color 0.3s;
         }
         .clock-12h {
             font-size: 1rem;
@@ -157,6 +160,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, border 0.3s;
         }
 
         /* Tab Navigation */
@@ -211,6 +215,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: background 0.3s, border 0.3s;
         }
         .countdown-text {
             font-size: 1.1rem;
@@ -243,12 +248,13 @@
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, border 0.3s;
         }
         .input-card h3, .input-card h2 {
             margin-top: 0;
             color: var(--primary);
             font-size: 1.3rem;
+            transition: color 0.3s;
         }
         textarea {
             width: 100%;
@@ -261,7 +267,7 @@
             box-sizing: border-box;
             margin-bottom: 12px;
             font-size: 1rem;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
         textarea:focus, input:focus {
             outline: none;
@@ -278,6 +284,7 @@
             font-size: 1.05rem;
             font-weight: bold;
             width: 100%;
+            transition: background-color 0.3s, color 0.3s;
             -webkit-tap-highlight-color: transparent;
         }
         button.action-btn:hover { background-color: #27ae60; }
@@ -313,13 +320,14 @@
             padding: 20px;
             text-align: center;
             margin-top: 25px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .calc-percent {
             font-size: 3rem;
             font-weight: bold;
             color: var(--accent);
             margin: 10px 0;
+            transition: color 0.3s;
         }
 
         /* Tables */
@@ -522,7 +530,7 @@
             to { transform: translateX(0); }
         }
 
-        /* DARK MODE OVERRIDES */
+        /* --- DARK MODE SETTINGS --- */
         body.dark-mode {
             background-color: #121212;
             color: #e0e0e0;
@@ -541,68 +549,159 @@
             color: #e0e0e0;
             box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
-        body.dark-mode th {
-            background-color: #0d1b2a;
-        }
-        body.dark-mode td, body.dark-mode th {
-            border-bottom: 1px solid #333;
-        }
-        body.dark-mode .tab-btn {
-            background-color: #333;
-            color: #e0e0e0;
-        }
-        body.dark-mode .tab-btn.active {
-            background-color: var(--accent);
-            color: white;
-        }
+        body.dark-mode th { background-color: #0d1b2a; }
+        body.dark-mode td, body.dark-mode th { border-bottom: 1px solid #333; }
+        body.dark-mode .tab-btn { background-color: #333; color: #e0e0e0; }
+        body.dark-mode .tab-btn.active { background-color: var(--accent); color: white; }
         body.dark-mode textarea, 
         body.dark-mode input[type="text"], 
         body.dark-mode input[type="number"] {
-            background-color: #2c2c2c;
-            color: #e0e0e0;
-            border-color: #444;
+            background-color: #2c2c2c; color: #e0e0e0; border-color: #444;
         }
         body.dark-mode .calc-result-box,
-        body.dark-mode .report-textarea {
-            background-color: #2a2a2a;
-            color: #e0e0e0;
-        }
+        body.dark-mode .report-textarea { background-color: #2a2a2a; color: #e0e0e0; }
         body.dark-mode .clock-12h,
         body.dark-mode .input-card p,
-        body.dark-mode .is-done {
-            color: #aaaaaa;
-        }
+        body.dark-mode .is-done { color: #aaaaaa; }
         body.dark-mode .header-panel h1,
         body.dark-mode .input-card h3, 
         body.dark-mode .input-card h2,
         body.dark-mode .clock,
         body.dark-mode .modal-content p,
-        body.dark-mode strong {
-            color: #e0e0e0;
+        body.dark-mode strong { color: #e0e0e0; }
+        body.dark-mode .is-done { background-color: #1e3a2f; }
+        body.dark-mode .tick-btn { background-color: #444; }
+        body.dark-mode .tick-btn:hover { background-color: #666; }
+        body.dark-mode .is-done .tick-btn { background-color: var(--success); }
+        body.dark-mode .checklist-done { background-color: #1e3a2f; }
+        body.dark-mode .checklist-done td { color: #7f8c8d; text-decoration: line-through; }
+        body.dark-mode #sync-status { background-color: #333; color: #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+
+        /* --- GSC OFFICIAL THEME SETTINGS --- */
+        body.gsc-theme { 
+            background-color: #000000; 
+            color: #ffffff; 
         }
-        body.dark-mode .is-done {
-            background-color: #1e3a2f;
+        body.gsc-theme .sidebar { 
+            background-color: #111111; 
+            border-right: 1px solid var(--gsc-gold); 
         }
-        body.dark-mode .tick-btn {
-            background-color: #444;
+        body.gsc-theme .sidebar-header { 
+            background-color: var(--gsc-gold); 
+            color: #000000; 
         }
-        body.dark-mode .tick-btn:hover {
-            background-color: #666;
+        body.gsc-theme .input-card, 
+        body.gsc-theme .table-responsive, 
+        body.gsc-theme .modal-content { 
+            background-color: #1a1a1a; 
+            color: #ffffff; 
+            border: 1px solid #333; 
         }
-        body.dark-mode .is-done .tick-btn {
-            background-color: var(--success);
+        body.gsc-theme th { 
+            background-color: var(--gsc-gold); 
+            color: #000000; 
+            font-weight: bold;
         }
-        body.dark-mode .checklist-done {
-            background-color: #1e3a2f; 
+        body.gsc-theme td { border-bottom: 1px solid #333; }
+        body.gsc-theme .tab-btn { 
+            background-color: #222; 
+            color: #ccc; 
+            border: 1px solid #333;
         }
-        body.dark-mode .checklist-done td {
-            color: #7f8c8d; 
-            text-decoration: line-through;
+        body.gsc-theme .tab-btn.active { 
+            background-color: var(--gsc-gold); 
+            color: #000; 
+            box-shadow: 0 2px 10px rgba(229, 169, 0, 0.4); 
+            border-color: var(--gsc-gold);
         }
-        body.dark-mode #sync-status {
-            background-color: #333;
-            color: #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        body.gsc-theme textarea, 
+        body.gsc-theme input[type="text"], 
+        body.gsc-theme input[type="number"] { 
+            background-color: #000; 
+            color: var(--gsc-gold); 
+            border-color: #555; 
+        }
+        body.gsc-theme textarea:focus, 
+        body.gsc-theme input[type="text"]:focus, 
+        body.gsc-theme input[type="number"]:focus {
+            border-color: var(--gsc-gold);
+            box-shadow: 0 0 0 2px rgba(229, 169, 0, 0.3);
+            outline: none;
+        }
+        body.gsc-theme .calc-result-box, 
+        body.gsc-theme .report-textarea { 
+            background-color: #111; 
+            color: var(--gsc-gold); 
+            border-color: var(--gsc-gold); 
+        }
+        body.gsc-theme .clock-12h, 
+        body.gsc-theme .input-card p { 
+            color: #aaaaaa; 
+        }
+        body.gsc-theme .header-panel h1, 
+        body.gsc-theme .input-card h3, 
+        body.gsc-theme .input-card h2, 
+        body.gsc-theme .clock, 
+        body.gsc-theme .modal-content p, 
+        body.gsc-theme strong, 
+        body.gsc-theme .calc-percent,
+        body.gsc-theme .time-text { 
+            color: var(--gsc-gold); 
+        }
+        body.gsc-theme .is-done { 
+            background-color: #111; 
+        }
+        body.gsc-theme .is-done .time-text {
+            color: #666;
+        }
+        body.gsc-theme .tick-btn { 
+            background-color: #333; 
+        }
+        body.gsc-theme .tick-btn:hover { 
+            background-color: var(--gsc-gold); 
+            color: #000; 
+        }
+        body.gsc-theme .is-done .tick-btn { 
+            background-color: var(--gsc-gold); 
+            color: #000; 
+        }
+        body.gsc-theme .checklist-done { 
+            background-color: #111; 
+        }
+        body.gsc-theme .checklist-done td { 
+            color: #555; 
+            text-decoration: line-through; 
+        }
+        body.gsc-theme #sync-status { 
+            background-color: #111; 
+            color: var(--gsc-gold); 
+            border: 1px solid var(--gsc-gold); 
+        }
+        body.gsc-theme .action-btn { 
+            background-color: var(--gsc-gold); 
+            color: #000; 
+        }
+        body.gsc-theme .action-btn:hover { 
+            background-color: #cda800; 
+        }
+        body.gsc-theme .global-next-banner { 
+            background-color: #111; 
+            border: 1px solid var(--gsc-gold); 
+            color: var(--gsc-gold); 
+        }
+        body.gsc-theme .countdown-banner { 
+            background: linear-gradient(135deg, #111, #000); 
+            border: 1px solid var(--gsc-gold); 
+            color: var(--gsc-gold); 
+        }
+        body.gsc-theme .hall-btn { 
+            color: #888; 
+            border-bottom: 1px solid #333;
+        }
+        body.gsc-theme .hall-btn:hover, 
+        body.gsc-theme .hall-btn.active { 
+            background-color: var(--gsc-gold); 
+            color: #000; 
         }
 
         /* MOBILE RESPONSIVE RULES */
@@ -632,6 +731,11 @@
                 background-color: transparent;
                 color: var(--accent);
             }
+            body.gsc-theme .hall-btn.active {
+                border-bottom: 3px solid var(--gsc-gold);
+                background-color: transparent;
+                color: var(--gsc-gold);
+            }
             .main-content { padding: 15px; }
             .header-panel {
                 flex-direction: column;
@@ -641,6 +745,7 @@
             .top-right-controls {
                 width: 100%;
                 justify-content: flex-end;
+                flex-wrap: wrap;
             }
             .clock { text-align: left; }
             
@@ -684,6 +789,14 @@
         <div class="header-panel">
             <h1 id="current-hall-title">Hall Management</h1>
             <div class="top-right-controls">
+                
+                <!-- NEW THEME SELECTOR -->
+                <select id="theme-selector" onchange="changeTheme()" style="padding: 8px 12px; border-radius: 8px; background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; outline: none; margin-right: 10px;">
+                    <option value="light">☀️ Light Theme</option>
+                    <option value="dark">🌙 Dark Theme</option>
+                    <option value="gsc">🍿 GSC Theme</option>
+                </select>
+
                 <!-- CLOUD SYNC INDICATOR BADGE -->
                 <div id="sync-status">
                     <div id="sync-dot" style="animation: pulse 1s infinite;"></div>
@@ -694,7 +807,6 @@
                     <div class="clock-12h">--:--:-- --</div>
                     <div class="clock-24h">--:--:--</div>
                 </div>
-                <button id="dark-toggle-btn" onclick="toggleDarkMode()" style="background:none; border:none; font-size:1.8rem; cursor:pointer; -webkit-tap-highlight-color: transparent; padding: 0;">🌙</button>
             </div>
         </div>
 
@@ -808,7 +920,7 @@
                     Tap the button below to launch the GSC web app directly in a new window/tab to check seat admissions manually.
                 </p>
                 <a href="https://epaymentwebapp.gsc.com.my/cinemas/showtime-by-cinemas/223/kuala-lumpur-nu-sentral" target="_blank" style="text-decoration: none;">
-                    <button class="action-btn" style="font-size: 1.2rem; padding: 18px 25px; background-color: var(--accent);">
+                    <button class="action-btn" style="font-size: 1.2rem; padding: 18px 25px;">
                         🚀 Launch GSC Portal (NU Sentral)
                     </button>
                 </a>
@@ -903,28 +1015,37 @@
             hallData[activeHalls[idx]] = [];
         }
 
-        // --- DARK MODE LOGIC ---
-        function toggleDarkMode() {
+        // --- NEW THEME LOGIC ---
+        function changeTheme() {
+            var theme = document.getElementById('theme-selector').value;
             var body = document.body;
-            var btn = document.getElementById('dark-toggle-btn');
             
-            if (body.classList.contains('dark-mode')) {
-                body.classList.remove('dark-mode');
-                btn.innerText = '🌙';
-                localStorage.setItem('gscDarkMode', 'light');
-            } else {
+            // Remove all existing theme classes first
+            body.classList.remove('dark-mode', 'gsc-theme');
+            
+            // Apply selected theme
+            if (theme === 'dark') {
                 body.classList.add('dark-mode');
-                btn.innerText = '☀️';
-                localStorage.setItem('gscDarkMode', 'dark');
+            } else if (theme === 'gsc') {
+                body.classList.add('gsc-theme');
             }
+            
+            // Save preference to local storage
+            localStorage.setItem('gscAppTheme', theme);
         }
 
         function loadTheme() {
-            var savedTheme = localStorage.getItem('gscDarkMode');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('dark-toggle-btn').innerText = '☀️';
+            var savedTheme = localStorage.getItem('gscAppTheme');
+            
+            // Fallback for older devices that used the old sun/moon toggle
+            if (!savedTheme && localStorage.getItem('gscDarkMode') === 'dark') {
+                savedTheme = 'dark';
+            } else if (!savedTheme) {
+                savedTheme = 'light'; // Default
             }
+
+            document.getElementById('theme-selector').value = savedTheme;
+            changeTheme();
         }
 
         // --- CONNECTION INDICATOR ---
@@ -1158,7 +1279,7 @@
 
         // Setup UI
         function init() {
-            loadTheme();
+            loadTheme(); // Load Light/Dark/GSC Theme on startup
             
             var sidebar = document.getElementById('sidebar');
             for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
