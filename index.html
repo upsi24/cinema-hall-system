@@ -27,7 +27,7 @@
             --success: #2ecc71;
             --light: #ecf0f1;
             --done-bg: #d5f5e3;
-            --gsc-gold: #ffcc00; /* UPDATED: Exact GSC Bright Yellow */
+            --gsc-gold: #ffcc00; 
         }
 
         /* --- IPHONE DESKTOP SITE FIX --- */
@@ -51,7 +51,7 @@
             
             overflow: hidden;
             flex-direction: row; 
-            transition: background-color 0.4s ease, color 0.4s ease;
+            transition: background 0.6s ease, color 0.4s ease;
         }
         
         /* Sidebar layout */
@@ -64,6 +64,7 @@
             overflow-y: auto;
             flex-shrink: 0;
             transition: background-color 0.4s ease;
+            z-index: 10;
         }
         .sidebar-header {
             padding: 20px;
@@ -91,7 +92,7 @@
             font-weight: bold;
         }
 
-        /* --- NEW ANIMATION FOR TAB SWITCHING --- */
+        /* --- ANIMATION FOR TAB SWITCHING --- */
         @keyframes contentFadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -109,6 +110,7 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             min-height: 0; 
+            perspective: 1200px; /* Prepares 3D space */
         }
         .header-panel {
             display: flex;
@@ -126,9 +128,10 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            z-index: 100;
         }
         
-        /* NEW SYNC BADGE STYLING */
+        /* SYNC BADGE STYLING */
         #sync-status {
             display: flex;
             align-items: center;
@@ -139,7 +142,7 @@
             padding: 6px 12px;
             border-radius: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: background-color 0.4s ease, color 0.4s ease;
+            transition: all 0.4s ease;
         }
         #sync-dot {
             width: 10px;
@@ -226,7 +229,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-            transition: background 0.4s ease, border 0.4s ease;
+            transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
         }
         .countdown-text {
             font-size: 1.1rem;
@@ -259,7 +262,7 @@
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
-            transition: background-color 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
+            transition: background-color 0.4s ease, border 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .input-card h3, .input-card h2 {
             margin-top: 0;
@@ -323,7 +326,7 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             text-align: center;
-            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.3s ease;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
         .calc-result-box {
             background-color: #f8f9fa;
@@ -350,7 +353,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             background: white;
-            transition: background-color 0.4s ease;
+            transition: background-color 0.4s ease, box-shadow 0.4s ease;
         }
         table {
             width: 100%;
@@ -363,7 +366,7 @@
             text-align: left;
             border-bottom: 1px solid #eee;
             vertical-align: middle;
-            transition: border-color 0.4s ease, background-color 0.3s ease;
+            transition: border-color 0.4s ease, background-color 0.3s ease, transform 0.3s ease;
         }
         th {
             background-color: var(--secondary);
@@ -538,12 +541,10 @@
         }
 
 
-        /* ================= THEME SETTINGS ================= */
+        /* ================= ORIGINAL THEME SETTINGS (UNTOUCHED) ================= */
         
-        /* 1. STANDARD DARK THEME (Original - Untouched structural design) */
-        body.dark-theme {
-            background-color: #121212; color: #e0e0e0;
-        }
+        /* 1. STANDARD DARK THEME */
+        body.dark-theme { background-color: #121212; color: #e0e0e0; }
         body.dark-theme .sidebar { background-color: #1a252f; border-right: 1px solid #333; }
         body.dark-theme .sidebar-header { background-color: #111; }
         body.dark-theme .input-card, body.dark-theme .table-responsive, body.dark-theme .modal-content {
@@ -567,8 +568,7 @@
         body.dark-theme .checklist-done td { color: #7f8c8d; text-decoration: line-through; }
         body.dark-theme #sync-status { background-color: #333; color: #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-
-        /* 2. GSC OFFICIAL THEME (Original layout, just updated exact Yellow color and active tab style) */
+        /* 2. GSC OFFICIAL THEME */
         body.gsc-theme { background-color: #000000; color: #ffffff; }
         body.gsc-theme .sidebar { background-color: #111111; border-right: 1px solid #333; }
         body.gsc-theme .sidebar-header { background-color: #000; color: var(--gsc-gold); border-bottom: 1px solid #333; }
@@ -580,7 +580,6 @@
         body.gsc-theme .tab-container { border-bottom: 1px solid #333; }
         body.gsc-theme .tab-btn { background-color: transparent; color: #aaa; border: none; border-radius: 20px; }
         body.gsc-theme .tab-btn:hover { color: #fff; }
-        /* Active Tab looks like the "Now Showing" pill */
         body.gsc-theme .tab-btn.active { background-color: #222; color: var(--gsc-gold); box-shadow: none; border: 1px solid #444; }
         body.gsc-theme textarea, body.gsc-theme input[type="text"], body.gsc-theme input[type="number"] { 
             background-color: #000; color: #fff; border-color: #444; 
@@ -600,7 +599,6 @@
         body.gsc-theme .checklist-done { background-color: #0a0a0a; }
         body.gsc-theme .checklist-done td { color: #555; text-decoration: line-through; }
         body.gsc-theme #sync-status { background-color: #111; color: #fff; border: 1px solid #333; }
-        /* Action buttons look like the Yellow "BUY TICKETS" button */
         body.gsc-theme .action-btn { background-color: var(--gsc-gold); color: #000; border-radius: 4px; font-weight: 900; }
         body.gsc-theme .action-btn:hover { background-color: #e6b800; }
         body.gsc-theme .global-next-banner { background-color: #111; border: 1px solid #333; color: var(--gsc-gold); }
@@ -609,147 +607,242 @@
         body.gsc-theme .hall-btn:hover, body.gsc-theme .hall-btn.active { background-color: transparent; color: var(--gsc-gold); border-left: 4px solid var(--gsc-gold); }
 
 
-        /* ================= EXPERIMENTAL 5 LATEST THEMES (Futuristic Redesign) ================= */
+        /* ================= 2026 ERA SUPER ANIMATED 3D THEMES (EXPERIMENTAL) ================= */
         
-        /* Shared Futuristic Base for the 5 experimental themes */
-        body.vortex-theme, body.payments-theme, body.fashion-theme, body.nature-theme, body.hoodie-theme {
-            background-color: #0f1115; color: #e0e0e0;
+        /* High-End Background Animation Keyframes */
+        @keyframes liquidFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        body.fashion-theme { background-color: #fff1f2; color: #333; } /* Fashion is light based */
-        body.nature-theme { background-color: #f7fee7; color: #333; } /* Nature is light based */
+        @keyframes floatTab {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px var(--accent), inset 0 0 10px var(--accent); }
+            50% { box-shadow: 0 0 20px var(--accent), inset 0 0 20px var(--accent); }
+            100% { box-shadow: 0 0 10px var(--accent), inset 0 0 10px var(--accent); }
+        }
+
+        /* Shared Glassmorphism & 3D Base */
+        body.vortex-theme, body.payments-theme, body.fashion-theme, body.nature-theme, body.hoodie-theme {
+            background-size: 200% 200%;
+            animation: liquidFlow 12s ease infinite;
+        }
 
         /* Shared Sidebar */
-        body.vortex-theme .sidebar, body.payments-theme .sidebar, body.hoodie-theme .sidebar { background-color: rgba(21, 24, 30, 0.95); border-right: 1px solid rgba(255,255,255,0.05); }
-        body.vortex-theme .sidebar-header, body.payments-theme .sidebar-header, body.hoodie-theme .sidebar-header { background-color: transparent; color: #fff; text-transform: uppercase; letter-spacing: 2px; font-size: 1rem; }
+        body.vortex-theme .sidebar, body.payments-theme .sidebar, body.hoodie-theme .sidebar,
+        body.fashion-theme .sidebar, body.nature-theme .sidebar { 
+            background-color: rgba(20, 20, 25, 0.6); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255,255,255,0.05); 
+            box-shadow: 5px 0 25px rgba(0,0,0,0.3);
+        }
+        body.vortex-theme .sidebar-header, body.payments-theme .sidebar-header, body.hoodie-theme .sidebar-header,
+        body.fashion-theme .sidebar-header, body.nature-theme .sidebar-header { 
+            background-color: transparent; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            font-size: 1rem; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
         
-        /* Futuristic Glassmorphism Cards & Tables */
+        /* 3D Glassmorphism Cards */
         body.vortex-theme .input-card, body.payments-theme .input-card, body.hoodie-theme .input-card,
+        body.fashion-theme .input-card, body.nature-theme .input-card,
         body.vortex-theme .table-responsive, body.payments-theme .table-responsive, body.hoodie-theme .table-responsive,
-        body.vortex-theme .modal-content, body.payments-theme .modal-content, body.hoodie-theme .modal-content {
-            background-color: rgba(26, 29, 36, 0.6); color: #e0e0e0; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        body.fashion-theme .table-responsive, body.nature-theme .table-responsive {
+            background-color: rgba(30, 32, 40, 0.45); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            border-radius: 20px; 
+            backdrop-filter: blur(25px) saturate(150%); 
+            -webkit-backdrop-filter: blur(25px) saturate(150%);
+            transform-style: preserve-3d;
         }
         
-        /* Smooth Table Hover Animation */
+        /* 3D Hover Tilt Effect on Cards */
+        body.vortex-theme .input-card:hover, body.payments-theme .input-card:hover, body.hoodie-theme .input-card:hover,
+        body.fashion-theme .input-card:hover, body.nature-theme .input-card:hover {
+            transform: translateY(-5px) rotateX(1deg) rotateY(-1deg);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        
+        /* Gliding Table Rows */
         body.vortex-theme tbody tr, body.payments-theme tbody tr, body.hoodie-theme tbody tr,
-        body.fashion-theme tbody tr, body.nature-theme tbody tr { transition: all 0.2s ease; }
-        
-        body.vortex-theme tbody tr:hover, body.payments-theme tbody tr:hover, body.hoodie-theme tbody tr:hover {
-            background-color: rgba(255,255,255,0.03); transform: scale(1.005);
+        body.fashion-theme tbody tr, body.nature-theme tbody tr { 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
+        body.vortex-theme tbody tr:hover, body.payments-theme tbody tr:hover, body.hoodie-theme tbody tr:hover,
         body.fashion-theme tbody tr:hover, body.nature-theme tbody tr:hover {
-            background-color: rgba(0,0,0,0.02); transform: scale(1.005);
+            background-color: rgba(255,255,255,0.05); 
+            transform: translateX(8px) scale(1.01);
+            box-shadow: -5px 5px 15px rgba(0,0,0,0.2);
         }
 
-        body.vortex-theme th, body.payments-theme th, body.hoodie-theme th { background-color: rgba(255,255,255,0.05); color: #fff; border-bottom: none; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
-        body.vortex-theme td, body.payments-theme td, body.hoodie-theme td { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        body.vortex-theme th, body.payments-theme th, body.hoodie-theme th,
+        body.fashion-theme th, body.nature-theme th { 
+            background-color: rgba(0,0,0,0.2); 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+            letter-spacing: 1px; 
+        }
+        body.vortex-theme td, body.payments-theme td, body.hoodie-theme td,
+        body.fashion-theme td, body.nature-theme td { border-bottom: 1px solid rgba(255,255,255,0.05); }
         
         /* Glowing Inputs */
-        body.vortex-theme textarea, body.vortex-theme input[type="text"], body.vortex-theme input[type="number"],
-        body.payments-theme textarea, body.payments-theme input[type="text"], body.payments-theme input[type="number"],
-        body.hoodie-theme textarea, body.hoodie-theme input[type="text"], body.hoodie-theme input[type="number"] {
-            background-color: rgba(0,0,0,0.3); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; transition: all 0.3s ease;
+        body.vortex-theme textarea, body.vortex-theme input,
+        body.payments-theme textarea, body.payments-theme input,
+        body.hoodie-theme textarea, body.hoodie-theme input,
+        body.fashion-theme textarea, body.fashion-theme input,
+        body.nature-theme textarea, body.nature-theme input {
+            background-color: rgba(0,0,0,0.3); 
+            color: #fff; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            transition: all 0.3s ease;
         }
 
-        /* Futuristic Pill Tabs */
+        /* Animated Floating Tabs */
         body.vortex-theme .tab-container, body.payments-theme .tab-container, body.hoodie-theme .tab-container,
-        body.fashion-theme .tab-container, body.nature-theme .tab-container { border-bottom: none; gap: 12px; }
+        body.fashion-theme .tab-container, body.nature-theme .tab-container { border-bottom: none; gap: 15px; overflow: visible; padding-top: 10px;}
         
-        body.vortex-theme .tab-btn, body.payments-theme .tab-btn, body.hoodie-theme .tab-btn { 
-            background-color: rgba(255,255,255,0.05); color: #aaa; border-radius: 30px; border: 1px solid transparent; 
+        body.vortex-theme .tab-btn, body.payments-theme .tab-btn, body.hoodie-theme .tab-btn,
+        body.fashion-theme .tab-btn, body.nature-theme .tab-btn { 
+            background-color: rgba(255,255,255,0.05); 
+            color: #aaa; 
+            border-radius: 30px; 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        body.vortex-theme .tab-btn:hover, body.payments-theme .tab-btn:hover, body.hoodie-theme .tab-btn:hover {
-            background-color: rgba(255,255,255,0.1); color: #fff;
+        body.vortex-theme .tab-btn:hover, body.payments-theme .tab-btn:hover, body.hoodie-theme .tab-btn:hover,
+        body.fashion-theme .tab-btn:hover, body.nature-theme .tab-btn:hover {
+            background-color: rgba(255,255,255,0.1); color: #fff; transform: translateY(-3px);
+        }
+        body.vortex-theme .tab-btn.active, body.payments-theme .tab-btn.active, body.hoodie-theme .tab-btn.active,
+        body.fashion-theme .tab-btn.active, body.nature-theme .tab-btn.active {
+            animation: floatTab 4s ease-in-out infinite, pulseGlow 3s infinite;
+            border: 1px solid var(--accent);
         }
 
+        /* Deep UI Elements */
         body.vortex-theme .calc-result-box, body.vortex-theme .report-textarea,
         body.payments-theme .calc-result-box, body.payments-theme .report-textarea,
-        body.hoodie-theme .calc-result-box, body.hoodie-theme .report-textarea { background-color: rgba(0,0,0,0.2); color: #e0e0e0; border-color: rgba(255,255,255,0.1); border-radius: 16px; }
-        
-        body.vortex-theme .is-done, body.payments-theme .is-done, body.hoodie-theme .is-done { background-color: rgba(0,0,0,0.2); }
-        body.vortex-theme .checklist-done, body.payments-theme .checklist-done, body.hoodie-theme .checklist-done { background-color: rgba(0,0,0,0.2); opacity: 0.6; }
-        body.vortex-theme #sync-status, body.payments-theme #sync-status, body.hoodie-theme #sync-status { background-color: rgba(255,255,255,0.05); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
-        
-        body.vortex-theme .header-panel h1, body.vortex-theme .clock, body.vortex-theme .input-card h2, body.vortex-theme .input-card h3, body.vortex-theme strong,
-        body.payments-theme .header-panel h1, body.payments-theme .clock, body.payments-theme .input-card h2, body.payments-theme .input-card h3, body.payments-theme strong,
-        body.hoodie-theme .header-panel h1, body.hoodie-theme .clock, body.hoodie-theme .input-card h2, body.hoodie-theme .input-card h3, body.hoodie-theme strong { color: #fff; font-weight: 800; }
-        
-        
-        /* Specific Colors & Glows for Experimental Themes */
-
-        /* 3. VORTEX THEME (Neon Green) */
-        body.vortex-theme { --accent: #39ff14; --success: #39ff14; }
-        body.vortex-theme .tab-btn.active { color: #000; background-color: #39ff14; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
-        body.vortex-theme .hall-btn.active { color: #39ff14; background: transparent; border-bottom: 2px solid #39ff14; text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
-        body.vortex-theme .action-btn { background-color: #39ff14; color: #000; box-shadow: 0 4px 15px rgba(57, 255, 20, 0.3); border-radius: 30px;}
-        body.vortex-theme .action-btn:hover { background-color: #32d613; box-shadow: 0 6px 20px rgba(57, 255, 20, 0.5); transform: translateY(-2px); }
-        body.vortex-theme textarea:focus, body.vortex-theme input:focus { border-color: #39ff14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.2); }
-        body.vortex-theme .calc-percent { color: #39ff14; text-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
-        body.vortex-theme .is-done .tick-btn { background-color: #39ff14; color: #000; box-shadow: 0 0 10px rgba(57, 255, 20, 0.4); }
-        body.vortex-theme .countdown-timer { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
-        
-        /* 4. FUTURE PAYMENTS THEME (Ocean Teal) */
-        body.payments-theme { --accent: #38bdf8; --success: #0ea5e9; }
-        body.payments-theme .tab-btn.active { background-color: transparent; border: 1px solid #38bdf8; color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3) inset, 0 0 15px rgba(56, 189, 248, 0.3); }
-        body.payments-theme .hall-btn.active { color: #38bdf8; background: transparent; border-bottom: 2px solid #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-        body.payments-theme .action-btn { background: linear-gradient(90deg, #0ea5e9, #38bdf8); color: #fff; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4); border-radius: 12px;}
-        body.payments-theme .action-btn:hover { background: linear-gradient(90deg, #0284c7, #0ea5e9); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.6); }
-        body.payments-theme textarea:focus, body.payments-theme input:focus { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
-        body.payments-theme .calc-percent { color: #38bdf8; text-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
-        body.payments-theme .is-done .tick-btn { background-color: #0ea5e9; box-shadow: 0 0 10px rgba(14, 165, 233, 0.4); }
-        body.payments-theme .countdown-timer { text-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
-
-        /* 5. STYLE HOODIE THEME (Deep Purple) */
-        body.hoodie-theme { --accent: #a855f7; --success: #9333ea; }
-        body.hoodie-theme .tab-btn.active { background-color: #a855f7; color: #fff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
-        body.hoodie-theme .hall-btn.active { color: #a855f7; background: transparent; border-bottom: 2px solid #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
-        body.hoodie-theme .action-btn { background-color: #9333ea; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4); border-radius: 8px;}
-        body.hoodie-theme .action-btn:hover { background-color: #7e22ce; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6); }
-        body.hoodie-theme textarea:focus, body.hoodie-theme input:focus { border-color: #a855f7; box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
-        body.hoodie-theme .calc-percent { color: #a855f7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
-        body.hoodie-theme .is-done .tick-btn { background-color: #9333ea; box-shadow: 0 0 10px rgba(147, 51, 234, 0.4); }
-        body.hoodie-theme .countdown-timer { text-shadow: 0 0 10px rgba(147, 51, 234, 0.5); }
-
-        /* 6. FASHIONABLE THEME (Rose Pink Glassmorphism) */
-        body.fashion-theme { --accent: #e11d48; --primary: #881337; --success: #e11d48; }
-        body.fashion-theme .sidebar { background-color: rgba(253, 164, 175, 0.9); backdrop-filter: blur(10px); color: #fff; border-right: 1px solid rgba(255,255,255,0.3); }
-        body.fashion-theme .sidebar-header { background-color: transparent; color: #fff; font-weight: 900; letter-spacing: 1px; }
-        body.fashion-theme .input-card, body.fashion-theme .table-responsive, body.fashion-theme .modal-content {
-            background-color: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 8px 32px rgba(225, 29, 72, 0.1); border-radius: 20px;
+        body.hoodie-theme .calc-result-box, body.hoodie-theme .report-textarea,
+        body.fashion-theme .calc-result-box, body.fashion-theme .report-textarea,
+        body.nature-theme .calc-result-box, body.nature-theme .report-textarea { 
+            background-color: rgba(0,0,0,0.25); 
+            color: #e0e0e0; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 16px; 
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
         }
-        body.fashion-theme .tab-btn { background-color: rgba(255,255,255,0.5); color: #881337; border-radius: 30px; }
-        body.fashion-theme .tab-btn.active { background-color: #e11d48; color: #fff; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4); }
-        body.fashion-theme .hall-btn { color: #ffe4e6; border-bottom: none; border-radius: 10px; margin: 5px 10px; padding: 12px 15px; }
-        body.fashion-theme .hall-btn:hover, body.fashion-theme .hall-btn.active { background-color: #e11d48; color: #fff; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); }
-        body.fashion-theme th { background-color: rgba(254, 205, 211, 0.5); color: #881337; border-bottom: none; border-radius: 8px 8px 0 0; }
-        body.fashion-theme td { border-bottom: 1px solid rgba(225, 29, 72, 0.1); }
-        body.fashion-theme textarea, body.fashion-theme input { background: rgba(255,255,255,0.8); border: 1px solid #fda4af; border-radius: 12px; }
-        body.fashion-theme textarea:focus, body.fashion-theme input:focus { border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.2); }
-        body.fashion-theme .action-btn { background-color: #e11d48; border-radius: 30px; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3); }
-        body.fashion-theme .action-btn:hover { background-color: #be123c; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(225, 29, 72, 0.4); }
-        body.fashion-theme .countdown-banner { background: linear-gradient(135deg, #fda4af, #e11d48); border-radius: 16px; box-shadow: 0 8px 25px rgba(225, 29, 72, 0.3); }
-        body.fashion-theme .is-done .tick-btn { background-color: #e11d48; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); }
-        body.fashion-theme #sync-status { background-color: rgba(255,255,255,0.7); backdrop-filter: blur(5px); color: #881337; }
         
-        /* 7. ECCO NATURE THEME (Earthy Green Soft) */
-        body.nature-theme { --accent: #65a30d; --primary: #14532d; --success: #65a30d; }
-        body.nature-theme .sidebar { background-color: #f7fee7; color: #14532d; border-right: 1px solid #d9f99d; }
-        body.nature-theme .sidebar-header { background-color: transparent; color: #14532d; font-weight: 800; border-bottom: 2px solid #d9f99d; }
-        body.nature-theme .input-card, body.nature-theme .table-responsive, body.nature-theme .modal-content {
-            background-color: #ffffff; border: 1px solid #ecfccb; box-shadow: 0 10px 30px rgba(101, 163, 13, 0.08); border-radius: 24px;
+        body.vortex-theme .is-done, body.payments-theme .is-done, body.hoodie-theme .is-done, body.fashion-theme .is-done, body.nature-theme .is-done { background-color: rgba(0,0,0,0.2); }
+        body.vortex-theme .checklist-done, body.payments-theme .checklist-done, body.hoodie-theme .checklist-done, body.fashion-theme .checklist-done, body.nature-theme .checklist-done { background-color: rgba(0,0,0,0.2); opacity: 0.5; filter: grayscale(100%); }
+        
+        /* Glowing Cloud Sync */
+        body.vortex-theme #sync-status, body.payments-theme #sync-status, body.hoodie-theme #sync-status, body.fashion-theme #sync-status, body.nature-theme #sync-status { 
+            background-color: rgba(0,0,0,0.4); 
+            color: #fff; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            backdrop-filter: blur(10px); 
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
         }
-        body.nature-theme .tab-btn { background-color: #ecfccb; color: #3f6212; border-radius: 12px; }
-        body.nature-theme .tab-btn.active { background-color: #65a30d; color: #fff; box-shadow: 0 4px 12px rgba(101, 163, 13, 0.3); }
-        body.nature-theme .hall-btn { color: #3f6212; border-bottom: 1px solid #ecfccb; font-weight: 500; }
-        body.nature-theme .hall-btn:hover, body.nature-theme .hall-btn.active { background-color: #d9f99d; color: #14532d; font-weight: 800; border-radius: 8px; margin: 0 10px; border: none; }
-        body.nature-theme th { background-color: #f7fee7; color: #14532d; border-bottom: 2px solid #d9f99d; }
-        body.nature-theme td { border-bottom: 1px solid #f7fee7; }
-        body.nature-theme textarea, body.nature-theme input { background: #f7fee7; border: 1px solid #d9f99d; border-radius: 12px; }
-        body.nature-theme textarea:focus, body.nature-theme input:focus { border-color: #65a30d; box-shadow: 0 0 0 3px rgba(101, 163, 13, 0.2); }
-        body.nature-theme .action-btn { background-color: #65a30d; border-radius: 12px; box-shadow: 0 4px 15px rgba(101, 163, 13, 0.2); }
-        body.nature-theme .action-btn:hover { background-color: #4d7c0f; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(101, 163, 13, 0.3); }
-        body.nature-theme .countdown-banner { background: linear-gradient(135deg, #65a30d, #4d7c0f); border-radius: 20px; box-shadow: 0 8px 25px rgba(101, 163, 13, 0.2); }
-        body.nature-theme .is-done .tick-btn { background-color: #65a30d; box-shadow: 0 4px 10px rgba(101, 163, 13, 0.3); }
-        body.nature-theme #sync-status { background-color: #fff; border: 1px solid #ecfccb; color: #14532d; }
+        
+        /* High Contrast Text */
+        body.vortex-theme .header-panel h1, body.vortex-theme .clock, body.vortex-theme .input-card h2, body.vortex-theme .input-card h3, body.vortex-theme strong, body.vortex-theme .sidebar-header,
+        body.payments-theme .header-panel h1, body.payments-theme .clock, body.payments-theme .input-card h2, body.payments-theme .input-card h3, body.payments-theme strong, body.payments-theme .sidebar-header,
+        body.hoodie-theme .header-panel h1, body.hoodie-theme .clock, body.hoodie-theme .input-card h2, body.hoodie-theme .input-card h3, body.hoodie-theme strong, body.hoodie-theme .sidebar-header,
+        body.fashion-theme .header-panel h1, body.fashion-theme .clock, body.fashion-theme .input-card h2, body.fashion-theme .input-card h3, body.fashion-theme strong, body.fashion-theme .sidebar-header,
+        body.nature-theme .header-panel h1, body.nature-theme .clock, body.nature-theme .input-card h2, body.nature-theme .input-card h3, body.nature-theme strong, body.nature-theme .sidebar-header { 
+            color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
+        }
+        
+        
+        /* === SPECIFIC COLOR & BG OVERRIDES FOR THE 5 THEMES === */
+
+        /* 3. VORTEX THEME (Neon Green Matrix) */
+        body.vortex-theme { 
+            --accent: #39ff14; --success: #39ff14; 
+            background: linear-gradient(135deg, #020803 0%, #0a250a 50%, #000000 100%);
+            color: #e0e0e0;
+        }
+        body.vortex-theme .tab-btn.active { color: #000; background-color: #39ff14; }
+        body.vortex-theme .hall-btn.active { color: #39ff14; background: rgba(57, 255, 20, 0.1); border-left: 4px solid #39ff14; border-bottom: none; text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+        body.vortex-theme .action-btn { background-color: #39ff14; color: #000; box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); border-radius: 30px;}
+        body.vortex-theme .action-btn:hover { background-color: #32d613; box-shadow: 0 0 30px rgba(57, 255, 20, 0.6); transform: translateY(-3px); }
+        body.vortex-theme textarea:focus, body.vortex-theme input:focus { border-color: #39ff14; box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); }
+        body.vortex-theme .calc-percent { color: #39ff14; text-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
+        body.vortex-theme .is-done .tick-btn { background-color: #39ff14; color: #000; box-shadow: 0 0 15px rgba(57, 255, 20, 0.5); }
+        body.vortex-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #39ff14; box-shadow: 0 0 20px rgba(57, 255, 20, 0.2); }
+        
+        /* 4. FUTURE PAYMENTS THEME (Ocean Teal Fluid) */
+        body.payments-theme { 
+            --accent: #38bdf8; --success: #0ea5e9; 
+            background: linear-gradient(135deg, #011221 0%, #082d4d 50%, #000000 100%);
+            color: #e0e0e0;
+        }
+        body.payments-theme .tab-btn.active { background-color: transparent; border: 1px solid #38bdf8; color: #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4) inset, 0 0 20px rgba(56, 189, 248, 0.4); }
+        body.payments-theme .hall-btn.active { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; border-bottom: none; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        body.payments-theme .action-btn { background: linear-gradient(90deg, #0ea5e9, #38bdf8); color: #fff; box-shadow: 0 0 20px rgba(14, 165, 233, 0.5); border-radius: 16px;}
+        body.payments-theme .action-btn:hover { background: linear-gradient(90deg, #0284c7, #0ea5e9); transform: translateY(-3px); box-shadow: 0 0 30px rgba(14, 165, 233, 0.7); }
+        body.payments-theme textarea:focus, body.payments-theme input:focus { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+        body.payments-theme .calc-percent { color: #38bdf8; text-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
+        body.payments-theme .is-done .tick-btn { background-color: #0ea5e9; box-shadow: 0 0 15px rgba(14, 165, 233, 0.5); }
+        body.payments-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
+
+        /* 5. STYLE HOODIE THEME (Deep Synthwave Purple) */
+        body.hoodie-theme { 
+            --accent: #a855f7; --success: #9333ea; 
+            background: linear-gradient(135deg, #110521 0%, #2e0954 50%, #000000 100%);
+            color: #e0e0e0;
+        }
+        body.hoodie-theme .tab-btn.active { background-color: #a855f7; color: #fff; }
+        body.hoodie-theme .hall-btn.active { color: #a855f7; background: rgba(168, 85, 247, 0.1); border-left: 4px solid #a855f7; border-bottom: none; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+        body.hoodie-theme .action-btn { background-color: #9333ea; box-shadow: 0 0 20px rgba(147, 51, 234, 0.5); border-radius: 8px;}
+        body.hoodie-theme .action-btn:hover { background-color: #7e22ce; transform: translateY(-3px); box-shadow: 0 0 30px rgba(147, 51, 234, 0.7); }
+        body.hoodie-theme textarea:focus, body.hoodie-theme input:focus { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+        body.hoodie-theme .calc-percent { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+        body.hoodie-theme .is-done .tick-btn { background-color: #9333ea; box-shadow: 0 0 15px rgba(147, 51, 234, 0.5); }
+        body.hoodie-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.2); }
+
+        /* 6. FASHIONABLE THEME (Rose Pink Silk) */
+        body.fashion-theme { 
+            --accent: #f43f5e; --primary: #e11d48; --success: #fb7185; 
+            background: linear-gradient(135deg, #380715 0%, #6e102b 50%, #000000 100%);
+            color: #ffe4e6;
+        }
+        body.fashion-theme .sidebar { background-color: rgba(136, 19, 55, 0.5); }
+        body.fashion-theme .tab-btn.active { background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; }
+        body.fashion-theme .hall-btn.active { color: #f43f5e; background: rgba(244, 63, 94, 0.1); border-left: 4px solid #f43f5e; border-bottom: none; text-shadow: 0 0 10px rgba(244, 63, 94, 0.5); }
+        body.fashion-theme .action-btn { background: linear-gradient(135deg, #f43f5e, #e11d48); border-radius: 30px; box-shadow: 0 0 20px rgba(225, 29, 72, 0.5); }
+        body.fashion-theme .action-btn:hover { background: #be123c; transform: translateY(-3px); box-shadow: 0 0 30px rgba(225, 29, 72, 0.7); }
+        body.fashion-theme textarea:focus, body.fashion-theme input:focus { border-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.3); }
+        body.fashion-theme .calc-percent { color: #f43f5e; text-shadow: 0 0 20px rgba(244, 63, 94, 0.5); }
+        body.fashion-theme .is-done .tick-btn { background-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.5); }
+        body.fashion-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
+        
+        /* 7. ECCO NATURE THEME (Earthy Bioluminescence) */
+        body.nature-theme { 
+            --accent: #84cc16; --primary: #4d7c0f; --success: #84cc16; 
+            background: linear-gradient(135deg, #091a0f 0%, #173f22 50%, #000000 100%);
+            color: #ecfccb;
+        }
+        body.nature-theme .sidebar { background-color: rgba(20, 83, 45, 0.5); }
+        body.nature-theme .tab-btn.active { background-color: #84cc16; color: #000; }
+        body.nature-theme .hall-btn.active { color: #84cc16; background: rgba(132, 204, 22, 0.1); border-left: 4px solid #84cc16; border-bottom: none; text-shadow: 0 0 10px rgba(132, 204, 22, 0.5); }
+        body.nature-theme .action-btn { background-color: #65a30d; color: #fff; border-radius: 16px; box-shadow: 0 0 20px rgba(101, 163, 13, 0.5); }
+        body.nature-theme .action-btn:hover { background-color: #4d7c0f; transform: translateY(-3px); box-shadow: 0 0 30px rgba(101, 163, 13, 0.7); }
+        body.nature-theme textarea:focus, body.nature-theme input:focus { border-color: #84cc16; box-shadow: 0 0 15px rgba(132, 204, 22, 0.3); }
+        body.nature-theme .calc-percent { color: #84cc16; text-shadow: 0 0 20px rgba(132, 204, 22, 0.5); }
+        body.nature-theme .is-done .tick-btn { background-color: #84cc16; color: #000; box-shadow: 0 0 15px rgba(132, 204, 22, 0.5); }
+        body.nature-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #84cc16; box-shadow: 0 0 20px rgba(132, 204, 22, 0.2); }
 
         /* MOBILE RESPONSIVE RULES */
         @media (max-width: 768px) {
@@ -782,12 +875,12 @@
                 box-shadow: none !important;
                 text-shadow: none !important;
             }
-            body.gsc-theme .hall-btn.active { border-bottom-color: var(--gsc-gold); color: var(--gsc-gold) !important; }
-            body.vortex-theme .hall-btn.active { border-bottom-color: #39ff14; color: #39ff14 !important; text-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important; }
-            body.payments-theme .hall-btn.active { border-bottom-color: #38bdf8; color: #38bdf8 !important; text-shadow: 0 0 8px rgba(56, 189, 248, 0.5) !important; }
-            body.hoodie-theme .hall-btn.active { border-bottom-color: #a855f7; color: #a855f7 !important; text-shadow: 0 0 8px rgba(168, 85, 247, 0.5) !important; }
-            body.fashion-theme .hall-btn.active { border-bottom-color: #e11d48; color: #e11d48 !important; background: transparent !important;}
-            body.nature-theme .hall-btn.active { border-bottom-color: #3f6212; color: #3f6212 !important; background: transparent !important;}
+            body.gsc-theme .hall-btn.active { border-bottom-color: var(--gsc-gold); color: var(--gsc-gold) !important; border-left: none; }
+            body.vortex-theme .hall-btn.active { border-bottom-color: #39ff14; color: #39ff14 !important; border-left: none; text-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important; }
+            body.payments-theme .hall-btn.active { border-bottom-color: #38bdf8; color: #38bdf8 !important; border-left: none; text-shadow: 0 0 8px rgba(56, 189, 248, 0.5) !important; }
+            body.hoodie-theme .hall-btn.active { border-bottom-color: #a855f7; color: #a855f7 !important; border-left: none; text-shadow: 0 0 8px rgba(168, 85, 247, 0.5) !important; }
+            body.fashion-theme .hall-btn.active { border-bottom-color: #f43f5e; color: #f43f5e !important; border-left: none; background: transparent !important; text-shadow: 0 0 8px rgba(244, 63, 94, 0.5) !important;}
+            body.nature-theme .hall-btn.active { border-bottom-color: #84cc16; color: #84cc16 !important; border-left: none; background: transparent !important; text-shadow: 0 0 8px rgba(132, 204, 22, 0.5) !important;}
 
             .main-content { padding: 15px; }
             .header-panel {
@@ -850,15 +943,15 @@
                     <option value="gsc">🍿 GSC Official Theme</option>
                     <option value="vortex">👽 Vortex (Neon Green)</option>
                     <option value="payments">🌊 Payments (Ocean Teal)</option>
-                    <option value="fashion">🌸 Fashionable (Rose Pink)</option>
-                    <option value="nature">🍃 Ecco Nature (Earthy Green)</option>
-                    <option value="hoodie">👾 Style Hoodie (Deep Purple)</option>
+                    <option value="fashion">🌸 Fashionable (Rose Silk)</option>
+                    <option value="nature">🍃 Ecco Nature (Bio Green)</option>
+                    <option value="hoodie">👾 Style Hoodie (Synthwave)</option>
                 </select>
 
                 <!-- CLOUD SYNC INDICATOR BADGE -->
                 <div id="sync-status">
                     <div id="sync-dot" style="animation: pulse 1s infinite;"></div>
-                    <span id="sync-text" style="font-weight: bold; display: none;">Connecting...</span>
+                    <span id="sync-text" style="font-weight: bold;">Connecting...</span>
                 </div>
 
                 <div class="clock" id="live-clock">
@@ -1115,9 +1208,11 @@
         // --- CONNECTION INDICATOR ---
         db.ref('.info/connected').on('value', function(snap) {
             var dot = document.getElementById('sync-dot');
+            var txt = document.getElementById('sync-text');
             if (snap.val() === true) {
                 dot.style.backgroundColor = 'var(--success)';
                 dot.style.animation = 'none';
+                txt.innerText = 'Cloud Synced';
                 
                 // Force seed cloud if Firebase erased empty arrays
                 db.ref('systemData/schedules').once('value').then(function(snapshot) {
@@ -1129,6 +1224,7 @@
             } else {
                 dot.style.backgroundColor = 'var(--danger)';
                 dot.style.animation = 'pulse 1s infinite';
+                txt.innerText = 'Offline';
             }
         });
 
@@ -1480,7 +1576,7 @@
                         "<td>" + t.name + "</td>" +
                         "<td>" + t.time + "</td>" +
                         "<td>DONE</td>" +
-                        "<td><button class='action-btn' style='padding:8px 15px; font-size:0.9rem; background-color: #bdc3c7; color: white; cursor: default;' disabled>Completed</button></td>";
+                        "<td><button class='action-btn' style='padding:8px 15px; font-size:0.9rem; background-color: #bdc3c7; color: white; cursor: default; box-shadow: none;' disabled>Completed</button></td>";
                 } else {
                     tr.innerHTML = 
                         "<td><strong>Hall " + t.hall + "</strong></td>" +
