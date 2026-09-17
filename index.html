@@ -28,6 +28,13 @@
             --light: #ecf0f1;
             --done-bg: #d5f5e3;
         }
+
+        /* --- IPHONE DESKTOP SITE FIX --- */
+        html {
+            height: -webkit-fill-available;
+        }
+        /* ------------------------------- */
+
         body {
             font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
@@ -35,6 +42,12 @@
             background-color: #f5f6fa;
             display: flex;
             height: 100vh;
+            
+            /* --- IPHONE DESKTOP SITE FIXES --- */
+            height: -webkit-fill-available;
+            -webkit-text-size-adjust: 100%;
+            /* --------------------------------- */
+            
             overflow: hidden;
             flex-direction: row; 
             transition: background-color 0.3s, color 0.3s;
@@ -1549,6 +1562,13 @@
 
         function parseAndSaveSchedule() {
             var rawText = document.getElementById('schedule-input').value;
+            
+            // 1. Prevent wiping data if the box is empty
+            if (rawText.trim() === "") {
+                alert("Box is empty! Existing data is safe.");
+                return;
+            }
+
             var lines = rawText.split('\n');
             var newSchedule = [];
 
@@ -1561,37 +1581,48 @@
                     var start = parts[0].trim();
                     var end = parts[1].trim();
                     
-                    var title = "";
-                    for (var j = 2; j < parts.length; j = j + 1) {
-                        title = title + parts[j];
-                        if (j < parts.length - 1) {
-                            title = title + "-";
+                    // 2. Strict format validation (must contain ':' for time)
+                    if (start.indexOf(':') !== -1 && end.indexOf(':') !== -1) {
+                        var title = "";
+                        for (var j = 2; j < parts.length; j = j + 1) {
+                            title = title + parts[j];
+                            if (j < parts.length - 1) {
+                                title = title + "-";
+                            }
                         }
+                        title = title.trim();
+
+                        var openTime = subtractMinutes(start, 15); 
+                        var check1 = addMinutes(start, 15);
+                        var check2 = addMinutes(check1, 35); 
+                        var check3 = addMinutes(check2, 35); 
+
+                        var slot = { 
+                            title: title, start: start, end: end,
+                            openTime: openTime, 
+                            cleanTime: end, doneClean: false, 
+                            check1: check1, done1: false, 
+                            check2: check2, done2: false, 
+                            check3: check3, done3: false, 
+                            alerted: [] 
+                        };
+                        newSchedule.push(slot);
                     }
-                    title = title.trim();
-
-                    var openTime = subtractMinutes(start, 15); 
-                    var check1 = addMinutes(start, 15);
-                    var check2 = addMinutes(check1, 35); 
-                    var check3 = addMinutes(check2, 35); 
-
-                    var slot = { 
-                        title: title, start: start, end: end,
-                        openTime: openTime, 
-                        cleanTime: end, doneClean: false, 
-                        check1: check1, done1: false, 
-                        check2: check2, done2: false, 
-                        check3: check3, done3: false, 
-                        alerted: [] 
-                    };
-                    newSchedule.push(slot);
                 }
             }
 
+            // 3. Enforce minimum 2 schedule lines
+            if (newSchedule.length < 2) {
+                alert("Upload failed! Invalid format or not enough data. Minimum 2 lines of schedule required.");
+                return;
+            }
+
+            // If it passes all tests, save it!
             hallData[activeHall] = newSchedule;
             saveToStorage(); 
             
             document.getElementById('schedule-input').value = ''; 
+            alert("Success! Hall " + activeHall + " schedule updated.");
         }
 
         function markDone(hallNum, slotIndex, checkNum) {
