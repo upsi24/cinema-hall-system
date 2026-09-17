@@ -93,7 +93,7 @@
             font-weight: bold;
         }
 
-        /* Content Fade Animation */
+        /* --- ANIMATION FOR TAB SWITCHING --- */
         @keyframes contentFadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -101,22 +101,26 @@
         .animated-view {
             animation: contentFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        /* --------------------------------------- */
 
         /* Main Content */
         .main-content {
             flex-grow: 1;
             display: block; 
             padding: 20px;
-            overflow-y: auto;
+            overflow-y: hidden; /* Prevent full page scroll */
             -webkit-overflow-scrolling: touch;
             min-height: 0; 
-            perspective: 1200px;
+            perspective: 1200px; 
+            display: flex;
+            flex-direction: column;
         }
         .header-panel {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            flex-shrink: 0;
         }
         .header-panel h1 {
             margin: 0;
@@ -131,7 +135,7 @@
             z-index: 100;
         }
 
-        /* THEME SELECTOR BUTTON (Standard Light Default) */
+        /* --- CUSTOM THEME SELECTOR BUTTON (Standard Light Default) --- */
         #theme-selector {
             appearance: none;
             -webkit-appearance: none;
@@ -198,9 +202,10 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: background-color 0.4s ease, border 0.4s ease;
+            flex-shrink: 0;
         }
 
-        /* Tab Navigation - FIXED SCROLLING */
+        /* Tab Navigation - STANDARD */
         .tab-container {
             display: flex;
             gap: 10px;
@@ -256,6 +261,7 @@
             align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.15);
             transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
+            flex-shrink: 0;
         }
         .countdown-text {
             font-size: 1.1rem;
@@ -289,16 +295,32 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             transition: background-color 0.4s ease, border 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
         }
-
-        /* ISOLATED CHECKLIST TABLE SCROLL BOX */
+        
+        /* CHECKLIST INTERNAL SCROLL CONTAINER */
+        #view-checklist {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for Firefox flex scrolling */
+        }
+        #view-checklist .input-card {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
         #checklist-scroll-container {
-            max-height: 520px;
+            flex-grow: 1;
             overflow-y: auto;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            position: relative;
             border-radius: 8px;
+            position: relative;
+            padding-bottom: 20px;
+            /* Smooth custom scrolling */
             scroll-behavior: smooth;
         }
 
@@ -669,7 +691,7 @@
         body.gsc-theme #theme-selector:hover { border-color: var(--gsc-gold); box-shadow: 0 0 10px rgba(255, 204, 0, 0.2); }
 
 
-        /* ================= EXPERIMENTAL 2026 THEMES ================= */
+        /* ================= 2026 ERA SUPER ANIMATED 3D THEMES (EXPERIMENTAL) ================= */
         
         @keyframes liquidFlow {
             0% { background-position: 0% 50%; }
@@ -860,7 +882,7 @@
             color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
         }
 
-        /* 3. VORTEX THEME (Neon Green) */
+        /* 3. VORTEX THEME (Neon Green Matrix) */
         body.vortex-theme { 
             --accent: #39ff14; --success: #39ff14; 
             background: linear-gradient(135deg, #020803 0%, #0a250a 50%, #000000 100%);
@@ -877,7 +899,7 @@
         body.vortex-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339ff14' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #39ff14; text-shadow: 0 0 8px rgba(57, 255, 20, 0.5); border-color: rgba(57, 255, 20, 0.3); }
         body.vortex-theme #theme-selector:hover { border-color: #39ff14; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
         
-        /* 4. FUTURE PAYMENTS THEME (Ocean Teal) */
+        /* 4. FUTURE PAYMENTS THEME (Ocean Teal Fluid) */
         body.payments-theme { 
             --accent: #38bdf8; --success: #0ea5e9; 
             background: linear-gradient(135deg, #011221 0%, #082d4d 50%, #000000 100%);
@@ -894,7 +916,7 @@
         body.payments-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.5); border-color: rgba(56, 189, 248, 0.3); }
         body.payments-theme #theme-selector:hover { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
 
-        /* 5. STYLE HOODIE THEME (Synthwave Purple) */
+        /* 5. STYLE HOODIE THEME (Deep Synthwave Purple) */
         body.hoodie-theme { 
             --accent: #a855f7; --success: #9333ea; 
             background: linear-gradient(135deg, #110521 0%, #2e0954 50%, #000000 100%);
@@ -911,7 +933,7 @@
         body.hoodie-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #a855f7; text-shadow: 0 0 8px rgba(168, 85, 247, 0.5); border-color: rgba(168, 85, 247, 0.3); }
         body.hoodie-theme #theme-selector:hover { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
 
-        /* 6. FASHIONABLE THEME (Rose Silk) */
+        /* 6. FASHIONABLE THEME (Rose Pink Silk) */
         body.fashion-theme { 
             --accent: #f43f5e; --primary: #e11d48; --success: #fb7185; 
             background: linear-gradient(135deg, #380715 0%, #6e102b 50%, #000000 100%);
@@ -930,7 +952,7 @@
         body.fashion-theme #theme-selector { background-color: rgba(255,255,255,0.7); color: #e11d48; border-color: rgba(244, 63, 94, 0.3); text-shadow: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e11d48' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
         body.fashion-theme #theme-selector:hover { border-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
         
-        /* 7. ECCO NATURE THEME (Bioluminescent Green) */
+        /* 7. ECCO NATURE THEME (Earthy Bioluminescence) */
         body.nature-theme { 
             --accent: #84cc16; --primary: #4d7c0f; --success: #84cc16; 
             background: linear-gradient(135deg, #091a0f 0%, #173f22 50%, #000000 100%);
@@ -949,7 +971,7 @@
         body.nature-theme #theme-selector { background-color: rgba(255,255,255,0.8); color: #3f6212; border-color: rgba(101, 163, 13, 0.3); text-shadow: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233f6212' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
         body.nature-theme #theme-selector:hover { border-color: #65a30d; box-shadow: 0 0 15px rgba(101, 163, 13, 0.4); }
 
-        /* Mobile Rules */
+        /* MOBILE RESPONSIVE RULES */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar {
@@ -1241,7 +1263,7 @@
 
     </div>
 
-    <!-- Toast Alert Box -->
+    <!-- Floating Reminder Panel -->
     <div class="reminder-panel" id="reminder-panel"></div>
 
     <script>
@@ -1323,13 +1345,6 @@
                 if (txt) {
                     txt.innerText = 'Cloud Synced';
                 }
-                
-                db.ref('systemData/schedules').once('value').then(function(snapshot) {
-                    if (!snapshot.val()) {
-                        var localSched = localStorage.getItem('gscCinemaData');
-                        if(localSched) db.ref('systemData/schedules').set(JSON.parse(localSched));
-                    }
-                });
             } else {
                 dot.style.backgroundColor = 'var(--danger)';
                 dot.style.animation = 'pulse 1s infinite';
@@ -1364,17 +1379,18 @@
 
             db.ref('systemData/schedules').on('value', function(snapshot) {
                 var data = snapshot.val();
-                if (data) {
-                    for (var idx = 0; idx < activeHalls.length; idx++) {
-                        var h = activeHalls[idx];
-                        hallData[h] = data[h] || [];
-                    }
-                    localStorage.setItem('gscCinemaData', JSON.stringify(hallData));
-                    renderTable();
-                    renderChecklist();
-                    updateCountdownDisplay();
-                    updateGlobalNextMovie();
+                
+                // If data is null, it means another device completely cleared it. Clear local too.
+                for (var idx = 0; idx < activeHalls.length; idx++) {
+                    var h = activeHalls[idx];
+                    hallData[h] = (data && data[h]) ? data[h] : [];
                 }
+                
+                localStorage.setItem('gscCinemaData', JSON.stringify(hallData));
+                renderTable();
+                renderChecklist();
+                updateCountdownDisplay();
+                updateGlobalNextMovie();
             });
 
             db.ref('systemData/forms').on('value', function(snapshot) {
@@ -1587,7 +1603,7 @@
             var viewId = 'view-' + tab;
 
             if (tab === 'checklist') {
-                document.getElementById(viewId).style.display = 'block';
+                document.getElementById(viewId).style.display = 'flex';
                 document.getElementById('tab-checklist-btn').classList.add('active');
                 shouldAutoScrollChecklist = true;
                 renderChecklist();
@@ -1719,7 +1735,7 @@
             updateLiveChecklistTimers();
             
             if (shouldAutoScrollChecklist) {
-                setTimeout(scrollToCurrentTask, 200); 
+                setTimeout(scrollToCurrentTask, 250); 
                 shouldAutoScrollChecklist = false;
             }
         }
@@ -2153,7 +2169,7 @@
                 updateCountdownDisplay();
                 updateGlobalNextMovie(); 
                 
-                if (document.getElementById('view-checklist').style.display === 'block') {
+                if (document.getElementById('view-checklist').style.display === 'flex' || document.getElementById('view-checklist').style.display === 'block') {
                     updateLiveChecklistTimers();
                 }
             }, 1000); 
