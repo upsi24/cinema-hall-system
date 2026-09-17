@@ -131,6 +131,30 @@
             gap: 15px;
             z-index: 100;
         }
+
+        /* --- CUSTOM THEME SELECTOR BUTTON (Standard Light Default) --- */
+        #theme-selector {
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 8px 35px 8px 15px;
+            border-radius: 8px;
+            background-color: var(--light);
+            color: var(--primary);
+            border: 2px solid #ccc;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
+            margin-right: 5px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        #theme-selector:hover { border-color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #theme-selector:focus { border-color: var(--accent); }
         
         /* SYNC BADGE STYLING */
         #sync-status {
@@ -568,6 +592,13 @@
         body.dark-theme .checklist-done { background-color: #1e3a2f; }
         body.dark-theme .checklist-done td { color: #7f8c8d; text-decoration: line-through; }
         body.dark-theme #sync-status { background-color: #333; color: #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        /* Custom Dropdown Override - Dark */
+        body.dark-theme #theme-selector {
+            background-color: #2c2c2c; color: #e0e0e0; border: 2px solid #444;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0e0e0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        body.dark-theme #theme-selector:hover { border-color: var(--accent); }
 
         /* 2. GSC OFFICIAL THEME */
         body.gsc-theme { background-color: #000000; color: #ffffff; }
@@ -606,6 +637,12 @@
         body.gsc-theme .countdown-banner { background: #111; border: 1px solid #333; color: var(--gsc-gold); }
         body.gsc-theme .hall-btn { color: #888; border-bottom: 1px solid #222; }
         body.gsc-theme .hall-btn:hover, body.gsc-theme .hall-btn.active { background-color: transparent; color: var(--gsc-gold); border-left: 4px solid var(--gsc-gold); }
+        /* Custom Dropdown Override - GSC */
+        body.gsc-theme #theme-selector {
+            background-color: #000; color: var(--gsc-gold); border: 2px solid #333; border-radius: 20px; box-shadow: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffcc00' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        }
+        body.gsc-theme #theme-selector:hover { border-color: var(--gsc-gold); box-shadow: 0 0 10px rgba(255, 204, 0, 0.2); }
 
 
         /* ================= 2026 ERA SUPER ANIMATED 3D THEMES (EXPERIMENTAL) ================= */
@@ -755,6 +792,20 @@
             backdrop-filter: blur(10px); 
             box-shadow: 0 0 15px rgba(255,255,255,0.1);
         }
+
+        /* --- THEME SELECTOR BUTTON (EXPERIMENTAL BASE) --- */
+        body.vortex-theme #theme-selector, body.payments-theme #theme-selector, body.hoodie-theme #theme-selector,
+        body.fashion-theme #theme-selector, body.nature-theme #theme-selector {
+            background-color: rgba(0,0,0,0.4);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
         
         /* High Contrast Text */
         body.vortex-theme .header-panel h1, body.vortex-theme .clock, body.vortex-theme .input-card h2, body.vortex-theme .input-card h3, body.vortex-theme strong, body.vortex-theme .sidebar-header,
@@ -782,6 +833,8 @@
         body.vortex-theme .calc-percent { color: #39ff14; text-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
         body.vortex-theme .is-done .tick-btn { background-color: #39ff14; color: #000; box-shadow: 0 0 15px rgba(57, 255, 20, 0.5); }
         body.vortex-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #39ff14; box-shadow: 0 0 20px rgba(57, 255, 20, 0.2); }
+        body.vortex-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339ff14' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #39ff14; text-shadow: 0 0 8px rgba(57, 255, 20, 0.5); border-color: rgba(57, 255, 20, 0.3); }
+        body.vortex-theme #theme-selector:hover { border-color: #39ff14; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
         
         /* 4. FUTURE PAYMENTS THEME (Ocean Teal Fluid) */
         body.payments-theme { 
@@ -797,6 +850,8 @@
         body.payments-theme .calc-percent { color: #38bdf8; text-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
         body.payments-theme .is-done .tick-btn { background-color: #0ea5e9; box-shadow: 0 0 15px rgba(14, 165, 233, 0.5); }
         body.payments-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
+        body.payments-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.5); border-color: rgba(56, 189, 248, 0.3); }
+        body.payments-theme #theme-selector:hover { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
 
         /* 5. STYLE HOODIE THEME (Deep Synthwave Purple) */
         body.hoodie-theme { 
@@ -812,6 +867,8 @@
         body.hoodie-theme .calc-percent { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
         body.hoodie-theme .is-done .tick-btn { background-color: #9333ea; box-shadow: 0 0 15px rgba(147, 51, 234, 0.5); }
         body.hoodie-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.2); }
+        body.hoodie-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #a855f7; text-shadow: 0 0 8px rgba(168, 85, 247, 0.5); border-color: rgba(168, 85, 247, 0.3); }
+        body.hoodie-theme #theme-selector:hover { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
 
         /* 6. FASHIONABLE THEME (Rose Pink Silk) */
         body.fashion-theme { 
@@ -828,6 +885,8 @@
         body.fashion-theme .calc-percent { color: #f43f5e; text-shadow: 0 0 20px rgba(244, 63, 94, 0.5); }
         body.fashion-theme .is-done .tick-btn { background-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.5); }
         body.fashion-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
+        body.fashion-theme #theme-selector { background-color: rgba(255,255,255,0.7); color: #e11d48; border-color: rgba(244, 63, 94, 0.3); text-shadow: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e11d48' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
+        body.fashion-theme #theme-selector:hover { border-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
         
         /* 7. ECCO NATURE THEME (Earthy Bioluminescence) */
         body.nature-theme { 
@@ -844,6 +903,8 @@
         body.nature-theme .calc-percent { color: #84cc16; text-shadow: 0 0 20px rgba(132, 204, 22, 0.5); }
         body.nature-theme .is-done .tick-btn { background-color: #84cc16; color: #000; box-shadow: 0 0 15px rgba(132, 204, 22, 0.5); }
         body.nature-theme .countdown-banner { background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid #84cc16; box-shadow: 0 0 20px rgba(132, 204, 22, 0.2); }
+        body.nature-theme #theme-selector { background-color: rgba(255,255,255,0.8); color: #3f6212; border-color: rgba(101, 163, 13, 0.3); text-shadow: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233f6212' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
+        body.nature-theme #theme-selector:hover { border-color: #65a30d; box-shadow: 0 0 15px rgba(101, 163, 13, 0.4); }
 
         /* MOBILE RESPONSIVE RULES */
         @media (max-width: 768px) {
@@ -937,8 +998,8 @@
             <h1 id="current-hall-title">Hall Management</h1>
             <div class="top-right-controls">
                 
-                <!-- MEGA THEME SELECTOR -->
-                <select id="theme-selector" onchange="changeTheme()" style="padding: 8px 12px; border-radius: 8px; background: var(--secondary); color: white; border: none; font-weight: bold; cursor: pointer; outline: none; margin-right: 5px;">
+                <!-- UPGRADED MEGA THEME SELECTOR -->
+                <select id="theme-selector" onchange="changeTheme()">
                     <option value="light">☀️ Standard Light</option>
                     <option value="dark">🌙 Standard Dark</option>
                     <option value="gsc">🍿 GSC Official Theme</option>
