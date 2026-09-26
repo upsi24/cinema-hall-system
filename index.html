@@ -304,7 +304,7 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            min-height: 0; /* Important for Firefox flex scrolling */
+            min-height: 0; 
         }
         #view-checklist .input-card {
             flex-grow: 1;
@@ -320,7 +320,6 @@
             border-radius: 8px;
             position: relative;
             padding-bottom: 20px;
-            /* Smooth custom scrolling */
             scroll-behavior: smooth;
         }
 
@@ -882,7 +881,7 @@
             color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
         }
 
-        /* 3. VORTEX THEME (Neon Green Matrix) */
+        /* 3. VORTEX THEME (Neon Green) */
         body.vortex-theme { 
             --accent: #39ff14; --success: #39ff14; 
             background: linear-gradient(135deg, #020803 0%, #0a250a 50%, #000000 100%);
@@ -899,7 +898,7 @@
         body.vortex-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339ff14' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #39ff14; text-shadow: 0 0 8px rgba(57, 255, 20, 0.5); border-color: rgba(57, 255, 20, 0.3); }
         body.vortex-theme #theme-selector:hover { border-color: #39ff14; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
         
-        /* 4. FUTURE PAYMENTS THEME (Ocean Teal Fluid) */
+        /* 4. FUTURE PAYMENTS THEME (Ocean Teal) */
         body.payments-theme { 
             --accent: #38bdf8; --success: #0ea5e9; 
             background: linear-gradient(135deg, #011221 0%, #082d4d 50%, #000000 100%);
@@ -916,7 +915,7 @@
         body.payments-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.5); border-color: rgba(56, 189, 248, 0.3); }
         body.payments-theme #theme-selector:hover { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
 
-        /* 5. STYLE HOODIE THEME (Deep Synthwave Purple) */
+        /* 5. STYLE HOODIE THEME (Synthwave Purple) */
         body.hoodie-theme { 
             --accent: #a855f7; --success: #9333ea; 
             background: linear-gradient(135deg, #110521 0%, #2e0954 50%, #000000 100%);
@@ -933,7 +932,7 @@
         body.hoodie-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #a855f7; text-shadow: 0 0 8px rgba(168, 85, 247, 0.5); border-color: rgba(168, 85, 247, 0.3); }
         body.hoodie-theme #theme-selector:hover { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
 
-        /* 6. FASHIONABLE THEME (Rose Pink Silk) */
+        /* 6. FASHIONABLE THEME (Rose Silk) */
         body.fashion-theme { 
             --accent: #f43f5e; --primary: #e11d48; --success: #fb7185; 
             background: linear-gradient(135deg, #380715 0%, #6e102b 50%, #000000 100%);
@@ -952,7 +951,7 @@
         body.fashion-theme #theme-selector { background-color: rgba(255,255,255,0.7); color: #e11d48; border-color: rgba(244, 63, 94, 0.3); text-shadow: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e11d48' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
         body.fashion-theme #theme-selector:hover { border-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
         
-        /* 7. ECCO NATURE THEME (Earthy Bioluminescence) */
+        /* 7. ECCO NATURE THEME (Bio Green) */
         body.nature-theme { 
             --accent: #84cc16; --primary: #4d7c0f; --success: #84cc16; 
             background: linear-gradient(135deg, #091a0f 0%, #173f22 50%, #000000 100%);
@@ -971,7 +970,7 @@
         body.nature-theme #theme-selector { background-color: rgba(255,255,255,0.8); color: #3f6212; border-color: rgba(101, 163, 13, 0.3); text-shadow: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233f6212' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
         body.nature-theme #theme-selector:hover { border-color: #65a30d; box-shadow: 0 0 15px rgba(101, 163, 13, 0.4); }
 
-        /* MOBILE RESPONSIVE RULES */
+        /* Mobile Rules */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar {
@@ -2024,7 +2023,14 @@
                         }
                         title = title.trim();
 
-                        var openTime = subtractMinutes(start, 15); 
+                        // NEW LOGIC: Open time is end of previous movie
+                        var openTime = "";
+                        if (newSchedule.length > 0) {
+                            openTime = newSchedule[newSchedule.length - 1].end; 
+                        } else {
+                            openTime = subtractMinutes(start, 45); // First movie opens 45m before
+                        }
+
                         var check1 = addMinutes(start, 15);
                         var check2 = addMinutes(check1, 35); 
                         var check3 = addMinutes(check2, 35); 
@@ -2201,6 +2207,7 @@
             return false;
         }
 
+        // --- DYNAMIC GLOBAL BANNER LOGIC ---
         function updateGlobalNextMovie() {
             var upcoming = [];
 
@@ -2209,9 +2216,19 @@
                 var sched = hallData[h];
                 if (sched) {
                     for (var i = 0; i < sched.length; i = i + 1) {
-                        var sec = getSecondsRemaining(sched[i].start);
-                        if (sec > -900 && sec <= 900) {
-                            var item = { hall: h, time: sched[i].start, seconds: sec };
+                        var startSec = getSecondsRemaining(sched[i].start);
+                        
+                        var prevEndSec = 0;
+                        if (i > 0) {
+                            prevEndSec = getSecondsRemaining(sched[i-1].end);
+                        } else {
+                            var firstOpen = subtractMinutes(sched[i].start, 45);
+                            prevEndSec = getSecondsRemaining(firstOpen);
+                        }
+                        
+                        // Show if previous movie finished (prevEndSec <= 0) AND within 15 min after current movie start (startSec > -900)
+                        if (prevEndSec <= 0 && startSec > -900) {
+                            var item = { hall: h, time: sched[i].start, seconds: startSec };
                             upcoming.push(item);
                         }
                     }
@@ -2225,7 +2242,7 @@
             var banner = document.getElementById('global-next-banner');
             
             if (upcoming.length === 0) {
-                banner.innerHTML = "<div style='opacity: 0.9;'>No halls currently in the 15-minute seating or ad window.</div>";
+                banner.innerHTML = "<div style='opacity: 0.9;'>No halls currently open for seating or playing ads.</div>";
                 return;
             }
 
@@ -2357,7 +2374,7 @@
                     if (!slot.alerted) slot.alerted = [];
                     
                     if (slot.openTime === currentTime && hasAlert(slot.alerted, 'open') === false) {
-                        showModalAlert(hall, slot.title, "SEATING OPENING (15 Mins to Start)!");
+                        showModalAlert(hall, slot.title, "SEATING OPENING NOW!");
                         triggerAlert(hall, slot.title, "HALL OPEN FOR SEATING!", 'warning');
                         slot.alerted.push('open');
                         saveToStorage(); 
