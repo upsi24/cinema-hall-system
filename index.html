@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
+    <!-- IPHONE DESKTOP SITE FIX -->
     <script>
         if (navigator.userAgent.match(/Macintosh/) && navigator.maxTouchPoints > 0 && window.screen.width <= 768) {
             document.querySelector("meta[name=viewport]").setAttribute("content", "width=1024");
@@ -12,6 +13,7 @@
 
     <title>Cinema Hall Check & Reminder System</title>
     
+    <!-- FIREBASE SDKS -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -1038,6 +1040,7 @@
 </head>
 <body>
 
+    <!-- Modal Alert -->
     <div id="alert-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <h2 id="modal-title">🚨 ALERT 🚨</h2>
@@ -1046,15 +1049,18 @@
         </div>
     </div>
 
+    <!-- Sidebar for 11 Halls -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">GSC Hall Selector</div>
     </div>
 
+    <!-- Main Content Area -->
     <div class="main-content">
         <div class="header-panel">
             <h1 id="current-hall-title">Hall Management</h1>
             <div class="top-right-controls">
                 
+                <!-- THEME SELECTOR -->
                 <select id="theme-selector" onchange="changeTheme()">
                     <option value="light">☀️ Standard Light</option>
                     <option value="dark">🌙 Standard Dark</option>
@@ -1066,6 +1072,7 @@
                     <option value="hoodie">👾 Style Hoodie (Synthwave)</option>
                 </select>
 
+                <!-- CLOUD SYNC INDICATOR BADGE -->
                 <div id="sync-status">
                     <div id="sync-dot" style="animation: pulse 1s infinite;"></div>
                     <span id="sync-text" style="font-weight: bold;">Connecting...</span>
@@ -1078,10 +1085,12 @@
             </div>
         </div>
 
+        <!-- Global Next Movie Banner -->
         <div class="global-next-banner" id="global-next-banner">
             <div>Scanning all halls...</div>
         </div>
 
+        <!-- Tab Controls (Smooth Touch-Scrollable) -->
         <div class="tab-container">
             <button class="tab-btn active" id="tab-checklist-btn" onclick="switchTab('checklist')">📋 Master Checklist</button>
             <button class="tab-btn" id="tab-schedule-btn" onclick="switchTab('schedule')">Hall Schedule</button>
@@ -1091,6 +1100,7 @@
             <button class="tab-btn" id="tab-ahu-btn" onclick="switchTab('ahu')">AHU Report</button>
         </div>
 
+        <!-- ================= VIEW 0: MASTER CHECKLIST ================= -->
         <div id="view-checklist" class="animated-view">
             <div class="countdown-banner" id="countdown-container">
                 <div class="countdown-text" id="countdown-label">Next Check: Calculating...</div>
@@ -1106,6 +1116,7 @@
                     <button class="action-btn" onclick="scrollToCurrentTask()" style="width: auto; padding: 7px 15px; font-size: 0.85rem; border-radius: 20px;">🎯 Find Next Task</button>
                 </div>
                 
+                <!-- Internal Scroll Box for Table -->
                 <div class="table-responsive" id="checklist-scroll-container">
                     <table id="checklist-table">
                         <thead>
@@ -1119,12 +1130,14 @@
                             </tr>
                         </thead>
                         <tbody id="checklist-body">
-                            </tbody>
+                            <!-- Filled by JS -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+        <!-- ================= VIEW 1: SCHEDULE & CHECKS ================= -->
         <div id="view-schedule" class="animated-view" style="display: none;">
             <div class="input-card">
                 <h3>Paste Schedule Output Here</h3>
@@ -1153,6 +1166,7 @@
             </div>
         </div>
 
+        <!-- ================= VIEW 2: OCCUPANCY CALCULATOR ================= -->
         <div id="view-occupancy" class="animated-view" style="display: none;">
             <div class="input-card" style="max-width: 600px; margin: 0 auto;">
                 <h2>Calculation Occupancy Rate</h2>
@@ -1180,6 +1194,7 @@
             </div>
         </div>
 
+        <!-- ================= VIEW 3: GSC WEBSITE SHORTCUT ================= -->
         <div id="view-gsc" class="animated-view" style="display: none;">
             <div class="input-card" style="max-width: 700px; margin: 0 auto; text-align: center;">
                 <h2>GSC NU Sentral Official Portal</h2>
@@ -1194,6 +1209,7 @@
             </div>
         </div>
 
+        <!-- ================= VIEW 4: TEMP REPORT GENERATOR ================= -->
         <div id="view-temp" class="animated-view" style="display: none;">
             <div class="two-col-container">
                 
@@ -1201,7 +1217,8 @@
                     <h2>Hourly Temperature Log</h2>
                     <div class="table-responsive" style="box-shadow: none;">
                         <table class="temp-input-table" id="temp-table-inputs">
-                            </table>
+                            <!-- Filled by JS -->
+                        </table>
                     </div>
                     <br>
                     <button class="action-btn" onclick="generateTempReport()">Generate Report & Copy</button>
@@ -1217,6 +1234,7 @@
             </div>
         </div>
 
+        <!-- ================= VIEW 5: AHU REPORT GENERATOR ================= -->
         <div id="view-ahu" class="animated-view" style="display: none;">
             <div class="two-col-container">
                 
@@ -1224,7 +1242,8 @@
                     <h2>Hourly AHU Reading</h2>
                     <div class="table-responsive" style="box-shadow: none;">
                         <table class="ahu-input-table" id="ahu-table-inputs">
-                            </table>
+                            <!-- Filled by JS -->
+                        </table>
                     </div>
                     <br>
                     <button class="action-btn" onclick="generateAhuReport()">Generate AHU Report & Copy</button>
@@ -1242,9 +1261,18 @@
 
     </div>
 
+    <!-- Toast Alert Box -->
     <div class="reminder-panel" id="reminder-panel"></div>
 
     <script>
+        // --- FAIL-SAFE STORAGE WRAPPERS ---
+        function safeGetItem(key) {
+            try { return localStorage.getItem(key); } catch(e) { return null; }
+        }
+        function safeSetItem(key, val) {
+            try { localStorage.setItem(key, val); } catch(e) {}
+        }
+
         // ================= FIREBASE CONFIGURATION =================
         const firebaseConfig = {
           apiKey: "AIzaSyBmYC41aGgizbJ46LsGMkuLKlcIaOs3_90",
@@ -1256,8 +1284,8 @@
           appId: "1:183012011376:web:855d4f085e44434ce8b3b5",
           measurementId: "G-6V7MG0QNYZ"
         };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        var db = null;
+        
         // ==========================================================
 
         // System Data
@@ -1288,13 +1316,13 @@
                 body.classList.add(theme + '-theme'); 
             }
             
-            localStorage.setItem('gscAppTheme', theme);
+            safeSetItem('gscAppTheme', theme);
         }
 
         function loadTheme() {
-            var savedTheme = localStorage.getItem('gscAppTheme');
+            var savedTheme = safeGetItem('gscAppTheme');
             
-            if (!savedTheme && localStorage.getItem('gscDarkMode') === 'dark') {
+            if (!savedTheme && safeGetItem('gscDarkMode') === 'dark') {
                 savedTheme = 'dark';
             } else if (!savedTheme) {
                 savedTheme = 'light'; 
@@ -1312,29 +1340,45 @@
             el.classList.add("animated-view");
         }
 
-        // --- CONNECTION INDICATOR ---
-        db.ref('.info/connected').on('value', function(snap) {
-            var dot = document.getElementById('sync-dot');
-            var txt = document.getElementById('sync-text');
-            
-            if (snap.val() === true) {
-                dot.style.backgroundColor = 'var(--success)';
-                dot.style.animation = 'none';
-                if (txt) {
-                    txt.innerText = 'Cloud Synced';
+        // --- INITIALIZE FIREBASE (CRASH-PROOF) ---
+        function initFirebase() {
+            try {
+                if (typeof firebase !== 'undefined') {
+                    firebase.initializeApp(firebaseConfig);
+                    db = firebase.database();
+                    
+                    db.ref('.info/connected').on('value', function(snap) {
+                        var dot = document.getElementById('sync-dot');
+                        var txt = document.getElementById('sync-text');
+                        
+                        if (snap.val() === true) {
+                            dot.style.backgroundColor = 'var(--success)';
+                            dot.style.animation = 'none';
+                            if (txt) {
+                                txt.innerText = 'Cloud Synced';
+                            }
+                        } else {
+                            dot.style.backgroundColor = 'var(--danger)';
+                            dot.style.animation = 'pulse 1s infinite';
+                            if (txt) {
+                                txt.innerText = 'Offline';
+                            }
+                        }
+                    });
+                } else {
+                    var txt = document.getElementById('sync-text');
+                    if (txt) txt.innerText = 'Offline (Script Error)';
                 }
-            } else {
-                dot.style.backgroundColor = 'var(--danger)';
-                dot.style.animation = 'pulse 1s infinite';
-                if (txt) {
-                    txt.innerText = 'Offline';
-                }
+            } catch (e) {
+                console.log("Firebase Init Error:", e);
+                var txt = document.getElementById('sync-text');
+                if (txt) txt.innerText = 'Offline (Error)';
             }
-        });
+        }
 
         // --- FIREBASE HYBRID SYNC ENGINE ---
         function loadFromStorage() {
-            var localSched = localStorage.getItem('gscCinemaData');
+            var localSched = safeGetItem('gscCinemaData');
             if (localSched) {
                 try { 
                     var parsed = JSON.parse(localSched);
@@ -1345,7 +1389,7 @@
                 } catch(e){}
             }
 
-            var localForms = localStorage.getItem('gscFormInputs');
+            var localForms = safeGetItem('gscFormInputs');
             if (localForms) {
                 try { applyFormInputsToUI(JSON.parse(localForms)); } catch(e){}
             }
@@ -1355,41 +1399,42 @@
             updateCountdownDisplay();
             updateGlobalNextMovie();
 
-            db.ref('systemData/schedules').on('value', function(snapshot) {
-                var data = snapshot.val();
-                
-                for (var idx = 0; idx < activeHalls.length; idx++) {
-                    var h = activeHalls[idx];
-                    hallData[h] = (data && data[h]) ? data[h] : [];
-                }
-                
-                localStorage.setItem('gscCinemaData', JSON.stringify(hallData));
-                renderTable();
-                renderChecklist();
-                updateCountdownDisplay();
-                updateGlobalNextMovie();
-            });
+            if (db) {
+                db.ref('systemData/schedules').on('value', function(snapshot) {
+                    var data = snapshot.val();
+                    
+                    for (var idx = 0; idx < activeHalls.length; idx++) {
+                        var h = activeHalls[idx];
+                        hallData[h] = (data && data[h]) ? data[h] : [];
+                    }
+                    
+                    safeSetItem('gscCinemaData', JSON.stringify(hallData));
+                    renderTable();
+                    renderChecklist();
+                    updateCountdownDisplay();
+                    updateGlobalNextMovie();
+                });
 
-            db.ref('systemData/forms').on('value', function(snapshot) {
-                var data = snapshot.val();
-                if (data) {
-                    localStorage.setItem('gscFormInputs', JSON.stringify(data));
-                    applyFormInputsToUI(data);
-                }
-            });
+                db.ref('systemData/forms').on('value', function(snapshot) {
+                    var data = snapshot.val();
+                    if (data) {
+                        safeSetItem('gscFormInputs', JSON.stringify(data));
+                        applyFormInputsToUI(data);
+                    }
+                });
+            }
         }
 
         function saveToStorage() {
-            localStorage.setItem('gscCinemaData', JSON.stringify(hallData));
+            safeSetItem('gscCinemaData', JSON.stringify(hallData));
             renderTable();
             renderChecklist();
             updateCountdownDisplay();
             updateGlobalNextMovie();
 
-            db.ref('systemData/schedules').set(hallData);
+            if (db) db.ref('systemData/schedules').set(hallData);
         }
 
-        // --- CLEAR ALL DATA (PASSWORD UPDATED: steward123 / Steward123 / STEWARD123) ---
         function clearAllData() {
             var pass = prompt("WARNING: This will delete ALL schedules for ALL 11 halls.\n\nEnter Admin Password to continue:");
             
@@ -1471,14 +1516,14 @@
                 }
             }
             
-            localStorage.setItem('gscFormInputs', JSON.stringify(formData));
-            db.ref('systemData/forms').set(formData);
+            safeSetItem('gscFormInputs', JSON.stringify(formData));
+            if (db) db.ref('systemData/forms').set(formData);
         }
         
         function clearFormInputs(type) {
             var confirmClear = confirm("Are you sure you want to clear these inputs? This syncs to all devices.");
             if (confirmClear) {
-                var savedDataStr = localStorage.getItem('gscFormInputs');
+                var savedDataStr = safeGetItem('gscFormInputs');
                 var formData = savedDataStr ? JSON.parse(savedDataStr) : { temp: {}, ahu: {} };
                 
                 if (type === 'temp') {
@@ -1500,8 +1545,8 @@
                     formData.ahu = {};
                 }
                 
-                localStorage.setItem('gscFormInputs', JSON.stringify(formData));
-                db.ref('systemData/forms').set(formData);
+                safeSetItem('gscFormInputs', JSON.stringify(formData));
+                if (db) db.ref('systemData/forms').set(formData);
             }
         }
 
@@ -1532,6 +1577,7 @@
 
         // Setup UI
         function init() {
+            initFirebase();
             loadTheme(); 
             
             var sidebar = document.getElementById('sidebar');
@@ -2002,7 +2048,13 @@
                         }
                         title = title.trim();
 
-                        var openTime = subtractMinutes(start, 15); 
+                        var openTime = "";
+                        if (newSchedule.length > 0) {
+                            openTime = newSchedule[newSchedule.length - 1].end; 
+                        } else {
+                            openTime = subtractMinutes(start, 45); // First movie opens 45m before
+                        }
+
                         var check1 = addMinutes(start, 15);
                         var check2 = addMinutes(check1, 35); 
                         var check3 = addMinutes(check2, 35); 
@@ -2179,7 +2231,7 @@
             return false;
         }
 
-        // --- NEW DYNAMIC OPEN SEATING BANNER LOGIC ---
+        // --- DYNAMIC GLOBAL BANNER LOGIC ---
         function updateGlobalNextMovie() {
             var upcoming = [];
 
@@ -2192,15 +2244,12 @@
                         var prevEndSec = 0;
                         
                         if (i > 0) {
-                            // Calculate seconds since the PREVIOUS movie ended
                             prevEndSec = getSecondsRemaining(sched[i-1].end);
                         } else {
-                            // First movie of the day opens 45 mins early
                             var firstOpen = subtractMinutes(sched[i].start, 45);
                             prevEndSec = getSecondsRemaining(firstOpen);
                         }
                         
-                        // Condition: Previous movie finished AND we are still before the 15m ad limit of the current movie
                         if (prevEndSec <= 0 && startSec > -900) {
                             upcoming.push({ hall: h, time: sched[i].start, seconds: startSec, title: sched[i].title });
                         }
@@ -2374,4 +2423,65 @@
                     if (slot.cleanTime === currentTime && hasAlert(slot.alerted, 'clean') === false && slot.doneClean === false) {
                         showModalAlert(hall, slot.title, "CLEANING REQUIRED!");
                         triggerAlert(hall, slot.title, "HALL CLEANING REQUIRED!", 'warning');
-                        slot.alert
+                        slot.alerted.push('clean');
+                        saveToStorage(); 
+                    }
+                    if (slot.check1 === currentTime && hasAlert(slot.alerted, 'c1') === false && slot.done1 === false) {
+                        triggerAlert(hall, slot.title, "1st Check (Take Temperature!)", 'danger');
+                        slot.alerted.push('c1');
+                        saveToStorage(); 
+                    }
+                    if (slot.check2 === currentTime && hasAlert(slot.alerted, 'c2') === false && slot.done2 === false) {
+                        triggerAlert(hall, slot.title, "2nd Check (Piracy Check)", 'danger');
+                        slot.alerted.push('c2');
+                        saveToStorage(); 
+                    }
+                    if (slot.check3 === currentTime && hasAlert(slot.alerted, 'c3') === false && slot.done3 === false) {
+                        triggerAlert(hall, slot.title, "3rd Check (Piracy Check)", 'danger');
+                        slot.alerted.push('c3');
+                        saveToStorage(); 
+                    }
+                }
+            }
+        }
+
+        function triggerAlert(hall, title, message, type) {
+            if (!type) { type = 'danger'; }
+            var panel = document.getElementById('reminder-panel');
+            var toast = document.createElement('div');
+            
+            toast.className = "alert-toast " + type;
+            
+            var msgHtml = "";
+            if (type === 'warning') {
+                msgHtml = "<span style='font-size:1.1rem; font-weight:bold;'>" + message + "</span>";
+            } else {
+                msgHtml = "<span style='font-size:0.9rem;'>" + message + "</span>";
+            }
+
+            var hallHeader = "";
+            if (hall === "ALL") {
+                hallHeader = "System Notification";
+            } else {
+                hallHeader = "Hall " + hall + " Action Required";
+            }
+
+            var titleHtml = "";
+            if (title) {
+                titleHtml = "<i style='font-size:0.85rem; opacity: 0.9;'>End of: " + title + "</i>";
+            }
+
+            toast.innerHTML = 
+                "<div>" +
+                    "<strong>" + hallHeader + "</strong><br>" +
+                    msgHtml + "<br>" + titleHtml +
+                "</div>" +
+                "<button onclick='this.parentElement.remove()'>Dismiss</button>";
+                
+            panel.appendChild(toast);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
