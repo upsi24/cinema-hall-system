@@ -101,7 +101,6 @@
         .animated-view {
             animation: contentFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        /* --------------------------------------- */
 
         /* Main Content */
         .main-content {
@@ -135,7 +134,7 @@
             z-index: 100;
         }
 
-        /* --- CUSTOM THEME SELECTOR BUTTON (Standard Light Default) --- */
+        /* THEME SELECTOR BUTTON (Standard Light Default) */
         #theme-selector {
             appearance: none;
             -webkit-appearance: none;
@@ -881,7 +880,7 @@
             color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
         }
 
-        /* 3. VORTEX THEME (Neon Green) */
+        /* 3. VORTEX THEME (Neon Green Matrix) */
         body.vortex-theme { 
             --accent: #39ff14; --success: #39ff14; 
             background: linear-gradient(135deg, #020803 0%, #0a250a 50%, #000000 100%);
@@ -898,7 +897,7 @@
         body.vortex-theme #theme-selector { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339ff14' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); color: #39ff14; text-shadow: 0 0 8px rgba(57, 255, 20, 0.5); border-color: rgba(57, 255, 20, 0.3); }
         body.vortex-theme #theme-selector:hover { border-color: #39ff14; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
         
-        /* 4. FUTURE PAYMENTS THEME (Ocean Teal) */
+        /* 4. FUTURE PAYMENTS THEME (Ocean Teal Fluid) */
         body.payments-theme { 
             --accent: #38bdf8; --success: #0ea5e9; 
             background: linear-gradient(135deg, #011221 0%, #082d4d 50%, #000000 100%);
@@ -1379,7 +1378,6 @@
             db.ref('systemData/schedules').on('value', function(snapshot) {
                 var data = snapshot.val();
                 
-                // If data is null, it means another device completely cleared it. Clear local too.
                 for (var idx = 0; idx < activeHalls.length; idx++) {
                     var h = activeHalls[idx];
                     hallData[h] = (data && data[h]) ? data[h] : [];
@@ -2023,14 +2021,8 @@
                         }
                         title = title.trim();
 
-                        // NEW LOGIC: Open time is end of previous movie
-                        var openTime = "";
-                        if (newSchedule.length > 0) {
-                            openTime = newSchedule[newSchedule.length - 1].end; 
-                        } else {
-                            openTime = subtractMinutes(start, 45); // First movie opens 45m before
-                        }
-
+                        // Fallback logic for initial openTime, but true open relies on dynamic calculation now
+                        var openTime = subtractMinutes(start, 15); 
                         var check1 = addMinutes(start, 15);
                         var check2 = addMinutes(check1, 35); 
                         var check3 = addMinutes(check2, 35); 
@@ -2207,7 +2199,7 @@
             return false;
         }
 
-        // --- DYNAMIC GLOBAL BANNER LOGIC ---
+        // --- NEW DYNAMIC OPEN SEATING BANNER LOGIC ---
         function updateGlobalNextMovie() {
             var upcoming = [];
 
@@ -2217,19 +2209,20 @@
                 if (sched) {
                     for (var i = 0; i < sched.length; i = i + 1) {
                         var startSec = getSecondsRemaining(sched[i].start);
-                        
                         var prevEndSec = 0;
+                        
                         if (i > 0) {
+                            // Calculate seconds since the PREVIOUS movie ended
                             prevEndSec = getSecondsRemaining(sched[i-1].end);
                         } else {
+                            // First movie of the day opens 45 mins early
                             var firstOpen = subtractMinutes(sched[i].start, 45);
                             prevEndSec = getSecondsRemaining(firstOpen);
                         }
                         
-                        // Show if previous movie finished (prevEndSec <= 0) AND within 15 min after current movie start (startSec > -900)
+                        // Condition: Previous movie finished AND we are still before the 15m ad limit of the current movie
                         if (prevEndSec <= 0 && startSec > -900) {
-                            var item = { hall: h, time: sched[i].start, seconds: startSec };
-                            upcoming.push(item);
+                            upcoming.push({ hall: h, time: sched[i].start, seconds: startSec, title: sched[i].title });
                         }
                     }
                 }
@@ -2242,28 +2235,38 @@
             var banner = document.getElementById('global-next-banner');
             
             if (upcoming.length === 0) {
-                banner.innerHTML = "<div style='opacity: 0.9;'>No halls currently open for seating or playing ads.</div>";
+                banner.innerHTML = "<div style='opacity: 0.9;'>No halls currently in seating or ad window.</div>";
                 return;
             }
 
-            var htmlText = "<div style='margin-bottom: 5px;'><strong>🟢 Currently Open for Seating & Ads:</strong></div>";
+            var htmlText = "<div style='margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;'><strong>🟢 Active Seating / Ads Status:</strong></div>";
             
             for (var j = 0; j < upcoming.length; j = j + 1) {
                 var item = upcoming[j];
                 var statusText = "";
-                var icon = "👉";
                 
                 if (item.seconds > 0) {
                     var mins = Math.floor(item.seconds / 60);
-                    statusText = "<span style='color:#ffeb3b; font-weight:bold;'> (Starts in " + mins + " min)</span>";
-                    icon = "👉";
+                    statusText = "<span style='color:#ffeb3b; font-weight:bold;'> (Movie Starts in " + mins + "m)</span>";
+                    
+                    var isExperimental = document.body.className.match(/(vortex|payments|hoodie|fashion|nature)-theme/);
+                    if (isExperimental) {
+                        htmlText += "<div style='margin-top: 6px; font-size: 0.95rem; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 6px;'>🚪 <strong>Hall " + item.hall + "</strong> - " + item.title + statusText + "</div>";
+                    } else {
+                        htmlText += "<div style='margin-top: 5px; font-size: 0.95rem;'>🚪 <strong>Hall " + item.hall + "</strong> - " + item.title + statusText + "</div>";
+                    }
+                    
                 } else {
                     var adMinsLeft = Math.ceil((900 + item.seconds) / 60);
-                    statusText = "<span style='color:#ff9800; font-weight:bold;'> (Ads Playing - " + adMinsLeft + " min left)</span>";
-                    icon = "🐒";
+                    statusText = "<span style='color:#ff9800; font-weight:bold;'> (Ads Playing - " + adMinsLeft + "m left)</span>";
+                    
+                    var isExperimental = document.body.className.match(/(vortex|payments|hoodie|fashion|nature)-theme/);
+                    if (isExperimental) {
+                        htmlText += "<div style='margin-top: 6px; font-size: 0.95rem; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 6px;'>🎬 <strong>Hall " + item.hall + "</strong> - " + item.title + statusText + "</div>";
+                    } else {
+                        htmlText += "<div style='margin-top: 5px; font-size: 0.95rem;'>🎬 <strong>Hall " + item.hall + "</strong> - " + item.title + statusText + "</div>";
+                    }
                 }
-                
-                htmlText = htmlText + "<div style='margin-top: 5px; font-size: 0.95rem;'>" + icon + " <strong>Hall " + item.hall + "</strong> at " + item.time + statusText + "</div>";
             }
 
             banner.innerHTML = htmlText;
@@ -2363,6 +2366,7 @@
             }
         }
         
+        // --- NEW DYNAMIC ALERT LOGIC ---
         function checkReminders(currentTime) {
             for (var idx = 0; idx < activeHalls.length; idx = idx + 1) {
                 var hall = activeHalls[idx];
@@ -2373,12 +2377,22 @@
                     var slot = currentSchedule[i];
                     if (!slot.alerted) slot.alerted = [];
                     
-                    if (slot.openTime === currentTime && hasAlert(slot.alerted, 'open') === false) {
-                        showModalAlert(hall, slot.title, "SEATING OPENING NOW!");
-                        triggerAlert(hall, slot.title, "HALL OPEN FOR SEATING!", 'warning');
+                    // NEW: Dynamically calculate open time exactly at the end of previous movie
+                    var dynamicOpenTime = "";
+                    if (i > 0) {
+                        dynamicOpenTime = currentSchedule[i-1].end;
+                    } else {
+                        dynamicOpenTime = subtractMinutes(slot.start, 45); // First movie
+                    }
+                    
+                    // Trigger "SEATING NOW OPEN" alert explicitly at this dynamic time
+                    if (dynamicOpenTime === currentTime && hasAlert(slot.alerted, 'open') === false) {
+                        showModalAlert(hall, slot.title, "SEATING & CLEANING NOW OPEN!\n(Previous movie has finished)");
+                        triggerAlert(hall, slot.title, "READY FOR CLEANING/SEATING!", 'warning');
                         slot.alerted.push('open');
                         saveToStorage(); 
                     }
+                    
                     if (slot.cleanTime === currentTime && hasAlert(slot.alerted, 'clean') === false && slot.doneClean === false) {
                         showModalAlert(hall, slot.title, "CLEANING REQUIRED!");
                         triggerAlert(hall, slot.title, "HALL CLEANING REQUIRED!", 'warning');
